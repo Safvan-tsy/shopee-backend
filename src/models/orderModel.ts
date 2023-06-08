@@ -128,6 +128,6 @@ const ordersSchema: Schema = new Schema(
 }
 );
 
-const Order = mongoose.model<Orders>("Orders", ordersSchema);
+const Order = mongoose.model<Orders>("orders", ordersSchema);
 
 export default Order;
