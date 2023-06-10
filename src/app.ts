@@ -3,10 +3,11 @@ import cookieParser from 'cookie-parser';
 import { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
+import cors from 'cors'
 
 import AppError from './utils/appError';
 import errorHandler from './controllers/errorController';
-import userRouter from './routes/userRouter';
+import productRouter from './routes/productRouter';
 
 const app: Express = express();
 
@@ -15,8 +16,10 @@ app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(cookieParser());
 app.use(mongoSanitize());
+app.use(cors());
+app.options('*', cors());
 
-app.use('/api/user',userRouter)
+app.use('/api/product',productRouter)
 
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404))
