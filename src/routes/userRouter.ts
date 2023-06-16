@@ -20,10 +20,10 @@ router
     .get(getUserProfile)
     .put(updateUserProfile)
 
-router
-    .route('/:id')
-    .get(getUserById)
-    .put(updateUserById)
-    .delete(deleteUser)
+// router
+//     .route('/:id')
+//     .get(getUserById)
+//     .put(updateUserById)
+//     .delete(deleteUser)
 
 export default router;
