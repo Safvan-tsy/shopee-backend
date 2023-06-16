@@ -8,6 +8,7 @@ import cors from 'cors'
 import AppError from './utils/appError';
 import errorHandler from './controllers/errorController';
 import productRouter from './routes/productRouter';
+import userRouter from './routes/userRouter';
 
 const app: Express = express();
 
@@ -19,7 +20,8 @@ app.use(mongoSanitize());
 app.use(cors());
 app.options('*', cors());
 
-app.use('/api/product',productRouter)
+app.use('/api/product',productRouter);
+app.use('/api/user',userRouter)
 
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404))
