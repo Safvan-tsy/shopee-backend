@@ -1,20 +1,20 @@
 import express from 'express';
 import {
-    registerUser, authUser,
     getAllUsers, getUserById,
     getUserProfile, updateUserById,
-    updateUserProfile, deleteUser, logoutUser
+    updateUserProfile, deleteUser
 } from '../controllers/userController';
+import {signUp, login, logout} from '../controllers/authController';
 
 const router = express.Router()
 
 router
     .route('/')
     .get(getAllUsers)
-    .post(registerUser)
+    .post(signUp)
 
-router.post('/logout', logoutUser)
-router.post('/login', authUser)
+router.post('/logout', logout)
+router.post('/login', login)
 router
     .route('/profile')
     .get(getUserProfile)
