@@ -3,6 +3,9 @@ import catchAsync from "../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
 import User from "../models/userModel";
 import jwt from 'jsonwebtoken';
+interface AuthenticatedRequest extends Request {
+    user?: any; // Replace `any` with the actual type of the `user` property
+}
 
 const signToken = (id: string) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -10,7 +13,7 @@ const signToken = (id: string) => {
     });
 };
 
-export const createSendToken = (user:any,statusCode:number, res:Response ) => {
+export const createSendToken = (user: any, statusCode: number, res: Response) => {
     const token = signToken(user._id)
     const cookieOptions = {
         expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRY) * 24 * 60 * 60 * 1000),
@@ -18,7 +21,7 @@ export const createSendToken = (user:any,statusCode:number, res:Response ) => {
         secure: process.env.NODE_ENV !== 'development'
     };
 
-    res.cookie('jwt',token,cookieOptions)
+    res.cookie('jwt', token, cookieOptions)
 
     user.password = undefined;
     res.status(statusCode).json({
@@ -31,7 +34,7 @@ export const createSendToken = (user:any,statusCode:number, res:Response ) => {
 
 };
 
-export const signUp = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const signUp = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
     const existingUser = await User.findOne({ email: req.body.email });
     if (existingUser) return next(new AppError('user already exist, Try loging in!', 400))
@@ -43,14 +46,14 @@ export const signUp = catchAsync(async (req: Request, res: Response, next: NextF
             password: req.body.password,
             passwordConfirm: req.body.passwordConfirm,
             role: req.body.role,
-            isAdmin:req.body.isAdmin
+            isAdmin: req.body.isAdmin
         }
     )
 
     createSendToken(newUser, 201, res)
 })
 
-export const login = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const login = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -63,11 +66,41 @@ export const login = catchAsync(async (req: Request, res: Response, next: NextFu
         return next(new AppError('Incorrect Email or password!', 404));
     }
 
-    createSendToken(user,200,res);
+    createSendToken(user, 200, res);
 
 })
 
-export const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
 
 })
+
+const protect = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    let token: string;
+    token = req.cookies.jwt;
+
+    if (token) {
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = (await User.findOne(decoded.id)).isSelected('-password')
+            next();
+        } catch (error) {
+            return next(new AppError('Not autherized, token verification failed', 401))
+        }
+
+    } else {
+        return next(new AppError('Not autherized', 401))
+    }
+
+})
+
+const isAdmin = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (req.user && req.user.isAdmin) {
+        next();
+    } else {
+        return next(new AppError('not authorized admin', 401))
+    }
+
+})
+
+export { isAdmin, protect, login, logout, signUp }

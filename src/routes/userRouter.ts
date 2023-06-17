@@ -4,7 +4,7 @@ import {
     getUserProfile, updateUserById,
     updateUserProfile, deleteUser
 } from '../controllers/userController';
-import {signUp, login, logout} from '../controllers/authController';
+import {signUp, login, logout, protect, isAdmin} from '../controllers/authController';
 
 const router = express.Router()
 
@@ -17,8 +17,8 @@ router.post('/logout', logout)
 router.post('/login', login)
 router
     .route('/profile')
-    .get(getUserProfile)
-    .put(updateUserProfile)
+    .get(protect,getUserProfile)
+    .put(protect,updateUserProfile)
 
 // router
 //     .route('/:id')
