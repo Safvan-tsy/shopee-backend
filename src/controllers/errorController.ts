@@ -31,9 +31,9 @@ const errorHandler = (err: Error, req: Request, res: Response, next: NextFunctio
   error.statusCode = error.statusCode || 500;
   error.status = error.status || 'error';
 
-  if (process.env.API_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development') {
     sendErrorDev(error, res);
-  } else if (process.env.API_ENV === 'production') {
+  } else if (process.env.NODE_ENV === 'production') {
     sendErrorProd(error, res);
   }
 };

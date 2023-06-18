@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import bcrypt from 'bcryptjs'
 
 interface Users extends Document {
     name: string;
@@ -6,6 +7,7 @@ interface Users extends Document {
     email: string;
     password: string;
     isAdmin: string;
+    correctPasswords(candidatePassword: string, userPassword: string): Promise<boolean>;
 }
 
 const usersSchema: Schema = new Schema(
@@ -23,6 +25,18 @@ const usersSchema: Schema = new Schema(
         },
         password: {
             type: String,
+            required: [true, "please enter password"],
+            select: false
+        },
+        passwordConfirm: {
+            type: String,
+            required: true,
+            validate: {
+                validator: function (el: string) {
+                    return el === this.password;
+                },
+                message: 'Passwords are not the same!'
+            }
         },
         isAdmin: {
             type: Boolean,
@@ -34,7 +48,16 @@ const usersSchema: Schema = new Schema(
     }
 );
 
+usersSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    this.password = await bcrypt.hash(this.password, 12);
+    this.passwordConfirm = undefined;
+    next()
+})
 
+usersSchema.methods.correctPasswords = async function (candidatePassword: string, userPassword: string): Promise<boolean> {
+    return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 const User = mongoose.model<Users>('users', usersSchema);
 
