@@ -10,7 +10,7 @@ const router = express.Router()
 
 router
     .route('/')
-    .get(getAllUsers)
+    .get(protect,isAdmin,getAllUsers)
     .post(signUp)
 
 router.post('/logout', logout)
@@ -20,10 +20,10 @@ router
     .get(protect,getUserProfile)
     .put(protect,updateUserProfile)
 
-// router
-//     .route('/:id')
-//     .get(getUserById)
-//     .put(updateUserById)
-//     .delete(deleteUser)
+router
+    .route('/:id')
+    .get(protect,isAdmin,getUserById)
+    .put(protect,isAdmin,updateUserById)
+    .delete(protect,isAdmin,deleteUser)
 
 export default router;

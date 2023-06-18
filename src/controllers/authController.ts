@@ -71,7 +71,15 @@ const login = catchAsync(async (req: Request, res: Response, next: NextFunction)
 })
 
 const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    res.cookie('jwt','',{
+        httpOnly:true,
+        expires:new Date(0)
+    });
 
+    res.status(200).json({
+        status:'success',
+        message:'logout success'
+    })
 
 })
 
