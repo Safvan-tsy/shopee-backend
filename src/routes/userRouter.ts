@@ -11,6 +11,9 @@ const router = express.Router()
 router
     .route('/')
     .get(protect,isAdmin,getAllUsers)
+
+router
+    .route('/signup')
     .post(signUp)
 
 router.post('/logout', logout)
