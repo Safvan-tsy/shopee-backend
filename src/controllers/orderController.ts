@@ -16,6 +16,12 @@ const addOrder = catchAsync(async (req, res, next) => {
 
 })
 
+const getOrderById = catchAsync(async (req, res, next) => {
+
+    res.status(200)
+
+})
+
 const getMyOrders = catchAsync(async (req, res, next) => {
 
     res.status(200)
@@ -42,4 +48,4 @@ const getOrders = catchAsync(async(req, res, next) => {
 
 
 
-export { addOrder, getMyOrders , getOrders, updateOrderToDelivered, updateOrderToPaid}
+export { addOrder, getMyOrders, getOrderById, getOrders, updateOrderToDelivered, updateOrderToPaid}
