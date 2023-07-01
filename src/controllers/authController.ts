@@ -18,7 +18,7 @@ export const createSendToken = (user: any, statusCode: number, res: Response) =>
     const token = signToken(user._id)
     const cookieOptions = {
         expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRY) * 24 * 60 * 60 * 1000),
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV !== 'development'
     };
 
@@ -86,19 +86,26 @@ const logout = catchAsync(async (req: Request, res: Response, next: NextFunction
 
 const protect = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     let token: string;
-    token = req.cookies.jwt;
+    if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')
+    ) {
+        token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies.jwt) {
+        token = req.cookies.jwt;
+    }
 
     if (token) {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            req.user = (await User.findOne(decoded.id)).isSelected('-password')
+            req.user = (await User.findOne(decoded._id)).isSelected('-password')
             next();
         } catch (error) {
-            return next(new AppError('Not autherized, token verification failed', 401))
+            return next(new AppError('Not authorized, token verification failed', 401))
         }
 
     } else {
-        return next(new AppError('Not autherized', 401))
+        return next(new AppError('Not authorized', 401))
     }
 
 })
