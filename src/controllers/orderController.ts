@@ -24,12 +24,12 @@ const addOrder = catchAsync(async (req, res, next) => {
         return next(new AppError('No order items provided', 400))
     }
     const order = new Order({
-        // orderItems: orderItems.map((x) => ({
-        //     ...x,
-        //     product: x._id,
-        //     _id: undefined
-        // })),
-        // user: req.user.id,
+        orderItems: orderItems.map((x) => ({
+            ...x,
+            product: x._id,
+            _id: undefined
+        })),
+        user: req.user._id,
         shippingAddress,
         paymentMethod,
         itemsPrice,
