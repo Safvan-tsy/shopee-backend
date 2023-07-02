@@ -24,7 +24,7 @@ interface Orders extends Document {
         updateTime: string;
         email: string
     };
-    itemPrice: number;
+    itemsPrice: number;
     taxPrice: number;
     shippingPrice: number;
     totalPrice: number;
@@ -93,7 +93,7 @@ const ordersSchema: Schema = new Schema(
                 type: String
             }
         },
-        itemPrice: {
+        itemsPrice: {
             type: Number,
             default: 0.0
         },
