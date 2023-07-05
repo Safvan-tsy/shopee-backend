@@ -3,12 +3,13 @@ import { signUp, login, logout, protect, isAdmin } from '../controllers/authCont
 import {
     addOrder, getMyOrders,
     getOrders, updateOrderToDelivered,
-    updateOrderToPaid, getOrderById
+    updateOrderToPaid, getOrderById, paymentIntent,  
 } from '../controllers/orderController';
 
 const router = express.Router()
 
 router.route('/').get(protect, isAdmin, getOrders).post(protect, addOrder)
+router.get('/secret', paymentIntent );
 router.route('/mine').get(protect, getMyOrders)
 router.route('/:id').get(protect, isAdmin, getOrderById)
 router.route('/:id/pay').put(protect, updateOrderToPaid)

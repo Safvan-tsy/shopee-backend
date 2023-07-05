@@ -4,8 +4,8 @@ import catchAsync from "../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY,{
-    apiVersion:'2022-11-15'
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2022-11-15'
 })
 
 declare global {
@@ -16,7 +16,19 @@ declare global {
     }
 }
 
-const paymentIntent = catchAsync(async(req,res,next)=> {
+const paymentIntent = catchAsync(async (req, res, next) => {
+    const paymentIntent = await stripe.paymentIntents.create({
+        amount: req.body.totalPrice,
+        currency: 'inr',
+        automatic_payment_methods: {
+            enabled: true,
+        },
+    });
+
+    res.status(200).json({
+        status:'success',
+            client_secret: paymentIntent.client_secret
+        })
 
 })
 const addOrder = catchAsync(async (req, res, next) => {
@@ -100,4 +112,4 @@ const getOrders = catchAsync(async (req, res, next) => {
 
 
 
-export { addOrder, getMyOrders, getOrderById, getOrders, updateOrderToDelivered, updateOrderToPaid }
+export { addOrder, getMyOrders, getOrderById, getOrders, updateOrderToDelivered, updateOrderToPaid, paymentIntent }
