@@ -1,6 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-
 interface Products extends Document {
     name: string;
     image: string;

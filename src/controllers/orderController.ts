@@ -2,6 +2,11 @@ import Order from "../models/orderModel";
 import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY,{
+    apiVersion:'2022-11-15'
+})
 
 declare global {
     namespace Express {
@@ -11,6 +16,9 @@ declare global {
     }
 }
 
+const paymentIntent = catchAsync(async(req,res,next)=> {
+
+})
 const addOrder = catchAsync(async (req, res, next) => {
     const { orderItems,
         shippingAddress,
