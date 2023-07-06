@@ -17,6 +17,7 @@ declare global {
 }
 
 const paymentIntent = catchAsync(async (req, res, next) => {
+    if(!req.body.totalPrice) return next(new AppError('hello', 400))
     const paymentIntent = await stripe.paymentIntents.create({
         amount: req.body.totalPrice,
         currency: 'inr',
@@ -24,11 +25,11 @@ const paymentIntent = catchAsync(async (req, res, next) => {
             enabled: true,
         },
     });
-
+console.log(paymentIntent.client_secret)
     res.status(200).json({
-        status:'success',
-            client_secret: paymentIntent.client_secret
-        })
+        status: 'success',
+        client_secret: paymentIntent.client_secret
+    })
 
 })
 const addOrder = catchAsync(async (req, res, next) => {

@@ -9,7 +9,7 @@ import {
 const router = express.Router()
 
 router.route('/').get(protect, isAdmin, getOrders).post(protect, addOrder)
-router.get('/secret', paymentIntent );
+router.post('/secret', paymentIntent );
 router.route('/mine').get(protect, getMyOrders)
 router.route('/:id').get(protect, isAdmin, getOrderById)
 router.route('/:id/pay').put(protect, updateOrderToPaid)
