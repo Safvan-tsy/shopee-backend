@@ -4,10 +4,6 @@ import catchAsync from "../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2022-11-15'
-})
-
 declare global {
     namespace Express {
         interface Request {
@@ -17,6 +13,9 @@ declare global {
 }
 
 const paymentIntent = catchAsync(async (req, res, next) => {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+        apiVersion: '2022-11-15'
+    })    
     if(!req.body.totalPrice) return next(new AppError('hello', 400))
     const paymentIntent = await stripe.paymentIntents.create({
         amount: req.body.totalPrice,
@@ -25,7 +24,7 @@ const paymentIntent = catchAsync(async (req, res, next) => {
             enabled: true,
         },
     });
-console.log(paymentIntent.client_secret)
+
     res.status(200).json({
         status: 'success',
         client_secret: paymentIntent.client_secret
