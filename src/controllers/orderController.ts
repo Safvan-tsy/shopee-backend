@@ -28,8 +28,6 @@ const paymentIntent = catchAsync(async (req, res, next) => {
         },
     });
 
-   
-
     res.status(200).json({
         status: 'success',
         client_secret: paymentIntent.client_secret
@@ -90,28 +88,46 @@ const getMyOrders = catchAsync(async (req, res, next) => {
     const orders = await Order.find({ user: req.user._id })
     res.status(200).json({
         status: 'success',
-        data: {
-            orders
-        }
+        orders
     })
 
 })
 
 const updateOrderToPaid = catchAsync(async (req, res, next) => {
 
-    res.status(200)
+    const order = await Order.findByIdAndUpdate(req.params.id,{isPaid:true},{new:true })
+
+    if(!order)return next(new AppError('failed to update',400))
+
+    res.status(200).json({
+        status:'success',
+        order
+    })
 
 })
 
 const updateOrderToDelivered = catchAsync(async (req, res, next) => {
 
-    res.status(200)
+   const order = await Order.findByIdAndUpdate(req.params.id,{isDelivered:true},{new:true })
+
+    if(!order)return next(new AppError('failed to update',400))
+    
+    res.status(200).json({
+        status:'success',
+        order
+    })
 
 })
 
 const getOrders = catchAsync(async (req, res, next) => {
+    const orders = await Order.find()
 
-    res.status(200)
+    if(!orders)return next(new AppError('failed to fetch orders',400))
+    
+    res.status(200).json({
+        status:'success',
+        orders
+    })
 
 })
 
