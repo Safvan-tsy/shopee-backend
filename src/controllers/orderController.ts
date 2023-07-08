@@ -2,6 +2,7 @@ import Order from "../models/orderModel";
 import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
+import Stripe from "stripe";
 
 declare global {
     namespace Express {
@@ -10,6 +11,30 @@ declare global {
         }
     }
 }
+
+const paymentIntent = catchAsync(async (req, res, next) => {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+        apiVersion: '2022-11-15'
+    });
+
+    // Convert totalPrice to cents by multiplying it by 100
+    const amountInCents = req.body.totalPrice * 100;
+
+    const paymentIntent = await stripe.paymentIntents.create({
+        amount: amountInCents,
+        currency: 'inr',
+        automatic_payment_methods: {
+            enabled: true,
+        },
+    });
+
+   
+
+    res.status(200).json({
+        status: 'success',
+        client_secret: paymentIntent.client_secret
+    });
+});
 
 const addOrder = catchAsync(async (req, res, next) => {
     const { orderItems,
@@ -92,4 +117,4 @@ const getOrders = catchAsync(async (req, res, next) => {
 
 
 
-export { addOrder, getMyOrders, getOrderById, getOrders, updateOrderToDelivered, updateOrderToPaid }
+export { addOrder, getMyOrders, getOrderById, getOrders, updateOrderToDelivered, updateOrderToPaid, paymentIntent }
