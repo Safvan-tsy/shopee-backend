@@ -18,9 +18,9 @@ const paymentIntent = catchAsync(async (req, res, next) => {
     });
 
     // Convert totalPrice to cents by multiplying it by 100
-    const amountInCents = req.body.totalPrice * 100;
+    const amountInCents = Math.round(req.body.totalPrice * 100);
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntents = await stripe.paymentIntents.create({
         amount: amountInCents,
         currency: 'inr',
         automatic_payment_methods: {
@@ -30,7 +30,7 @@ const paymentIntent = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
         status: 'success',
-        client_secret: paymentIntent.client_secret
+        client_secret: paymentIntents.client_secret
     });
 });
 
@@ -94,7 +94,6 @@ const getMyOrders = catchAsync(async (req, res, next) => {
 })
 
 const updateOrderToPaid = catchAsync(async (req, res, next) => {
-
     const order = await Order.findByIdAndUpdate(req.params.id,{isPaid:true},{new:true })
 
     if(!order)return next(new AppError('failed to update',400))
