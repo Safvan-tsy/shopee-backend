@@ -30,7 +30,6 @@ const usersSchema: Schema = new Schema(
         },
         passwordConfirm: {
             type: String,
-            required: true,
             validate: {
                 validator: function (el: string) {
                     return el === this.password;

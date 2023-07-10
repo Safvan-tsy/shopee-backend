@@ -2,7 +2,7 @@ import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
 import User from "../models/userModel";
-
+import { createSendToken } from "./authController";
 interface AuthenticatedRequest extends Request {
     user?: any; // Replace `any` with the actual type of the `user` property
 }
@@ -32,12 +32,8 @@ export const updateUserProfile = catchAsync(async (req: AuthenticatedRequest, re
        if(req.body.password) user.password = req.body.password;
  
        const updatedUser = await user.save();
-       res.status(200).json({
-        status:'success',
-        data:{
-            updatedUser
-        }
-       })
+       
+       createSendToken(updatedUser, 200, res);
     }else{
         return next(new AppError('user profile fetching failed',400))
     }
