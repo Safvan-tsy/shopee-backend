@@ -94,25 +94,32 @@ const getMyOrders = catchAsync(async (req, res, next) => {
 })
 
 const updateOrderToPaid = catchAsync(async (req, res, next) => {
-    const order = await Order.findByIdAndUpdate(req.params.id,{isPaid:true},{new:true })
+    const order = await Order.findByIdAndUpdate(
+        req.params.id,
+        { isPaid: true, deliveredAt: Date.now() },
+        { new: true }
+    )
 
-    if(!order)return next(new AppError('failed to update',400))
+    if (!order) return next(new AppError('failed to update', 400))
 
     res.status(200).json({
-        status:'success',
+        status: 'success',
         order
     })
 
 })
 
 const updateOrderToDelivered = catchAsync(async (req, res, next) => {
+    const order = await Order.findByIdAndUpdate(
+        req.params.id,
+        { isDelivered: true, deliveredAt: Date.now() },
+        { new: true }
+    )
 
-   const order = await Order.findByIdAndUpdate(req.params.id,{isDelivered:true},{new:true })
+    if (!order) return next(new AppError('failed to update', 400))
 
-    if(!order)return next(new AppError('failed to update',400))
-    
     res.status(200).json({
-        status:'success',
+        status: 'success',
         order
     })
 
@@ -121,10 +128,10 @@ const updateOrderToDelivered = catchAsync(async (req, res, next) => {
 const getOrders = catchAsync(async (req, res, next) => {
     const orders = await Order.find()
 
-    if(!orders)return next(new AppError('failed to fetch orders',400))
-    
+    if (!orders) return next(new AppError('failed to fetch orders', 400))
+
     res.status(200).json({
-        status:'success',
+        status: 'success',
         orders
     })
 
