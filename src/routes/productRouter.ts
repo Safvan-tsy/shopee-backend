@@ -1,10 +1,13 @@
 import express from 'express';
-import { getAllProducts, getOneProduct } from '../controllers/productsController';
+import { protect, isAdmin  } from '../controllers/authController';
+import { getAllProducts, getOneProduct, addProduct } from '../controllers/productsController';
+
 const router = express.Router()
 
 router
     .route('/')
     .get(getAllProducts)
+    .post(protect, isAdmin, addProduct)
 
 router
     .route('/:id')
