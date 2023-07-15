@@ -35,11 +35,11 @@ const getOneProduct = catchAsync(async (req, res, next) => {
 
 const addProduct = catchAsync(async (req, res, next) => {
     const product = new Product({
-        name:req.body.name,
-        price:req.body.price,
-        user:req.user._id,
-        brand:req.body.brand,
-        category:req.body.category
+        name: req.body.name,
+        price: req.body.price,
+        user: req.user._id,
+        brand: req.body.brand,
+        category: req.body.category
     })
 
     await product.save()
@@ -49,4 +49,26 @@ const addProduct = catchAsync(async (req, res, next) => {
     })
 })
 
-export { getOneProduct, getAllProducts , addProduct}
+const updateProduct = catchAsync(async (req, res, next) => {
+    const { name, price, description, image, brand, category, countInStock } = req.body;
+    const product = await Product.findById(req.params.id);
+
+    if (product) {
+        product.name = name;
+        product.price = price;
+        product.brand = brand;
+        product.image = image;
+        product.description = description;
+        product.category = category;
+        product.countInStock = countInStock;
+    }
+
+    const updatedProduct = await product.save()
+    res.status(200).json({
+        status: 'success',
+        product: updatedProduct
+    })
+
+})
+
+export { getOneProduct, getAllProducts, addProduct , updateProduct}
