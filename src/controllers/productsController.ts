@@ -104,7 +104,7 @@ const uploadProdImages = upload.fields([
     { name: 'images', maxCount: 3 }
 ])
 const prodImageUploader = catchAsync(async (req, res, next) => {
-    if (!req.files.imageCover) { return next(new AppError('No mage found',400))}
+    if (!req.files.imageCover) { return next(new AppError('No mage found', 400)) }
 
     // Cover image
     const response = await cloudinary.uploader.upload(req.files.imageCover[0].path, {
@@ -130,4 +130,19 @@ const prodImageUploader = catchAsync(async (req, res, next) => {
     })
 })
 
-export { getOneProduct, getAllProducts, addProduct, updateProduct, uploadProdImages, prodImageUploader }
+const deleteProduct = catchAsync(async (req, res, next) => {
+    const product = await Product.findById(req.params.id)
+    if (product) {
+        await Product.deleteOne({ _id: req.params.id });
+        res.status(204).json({
+            status: 'success',
+            message: 'Deleted'
+        })
+    } else {
+        res.status(404).json({
+            message: 'not found'
+        })
+    }
+})
+
+export { getOneProduct, getAllProducts, addProduct, updateProduct, uploadProdImages, prodImageUploader, deleteProduct }

@@ -6,7 +6,8 @@ import {
     addProduct,
     updateProduct,
     prodImageUploader,
-    uploadProdImages
+    uploadProdImages,
+    deleteProduct
 } from '../controllers/productsController';
 
 const router = express.Router()
@@ -24,5 +25,6 @@ router
     .route('/:id')
     .get(getOneProduct)
     .put(protect, isAdmin, updateProduct)
+    .delete(protect, isAdmin, deleteProduct)
 
 export default router;
