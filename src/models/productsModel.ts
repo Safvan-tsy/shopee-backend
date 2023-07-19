@@ -77,7 +77,7 @@ const reviewsSchema: Schema = new Schema(
     {
         product: {
                 type: Schema.Types.ObjectId,
-                ref: "Review",
+                ref: "Product",
         },
         name: {
             type: String,

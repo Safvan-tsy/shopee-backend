@@ -8,7 +8,8 @@ import {
     prodImageUploader,
     uploadProdImages,
     deleteProduct,
-    createReview
+    createReview,
+    getReviews
 } from '../controllers/productsController';
 
 const router = express.Router()
@@ -30,6 +31,7 @@ router
 
 router
     .route('/:id/review')
+    .get(getReviews)
     .post(protect,createReview)
 
 

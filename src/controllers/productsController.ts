@@ -156,7 +156,7 @@ const createReview = catchAsync(async (req, res, next) => {
     }
 
     // Check if the user has already reviewed the product
-    const alreadyReviewed = await Review.findOne({ user: userId, product: productId });
+    const alreadyReviewed = await Review.find({ user: userId, product: productId });
     if (alreadyReviewed) {
         return next(new AppError('Product already reviewed', 400));
     }
@@ -167,6 +167,7 @@ const createReview = catchAsync(async (req, res, next) => {
     // Create the review document
     const review = await Review.create({
         user: userId,
+        name:req.user.name,
         product: productId,
         rating: rating,
         comment: comment
@@ -189,6 +190,14 @@ const createReview = catchAsync(async (req, res, next) => {
     });
 });
 
+const getReviews = catchAsync(async (req, res, next) => {
+   const reviews = await Review.find({product:req.params.id})
+   res.status(200).json({
+    status:'success',
+    reviews
+   })
+})
+
 
 export {
     getOneProduct,
@@ -198,5 +207,6 @@ export {
     uploadProdImages,
     prodImageUploader,
     deleteProduct,
-    createReview
+    createReview,
+    getReviews
 }
