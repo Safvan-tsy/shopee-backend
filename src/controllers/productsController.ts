@@ -1,6 +1,6 @@
 import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
-import { Product } from "../models/productsModel";
+import { Product ,Review} from "../models/productsModel";
 import { Request, Response, NextFunction } from 'express';
 import multer, { StorageEngine, FileFilterCallback } from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
@@ -145,4 +145,58 @@ const deleteProduct = catchAsync(async (req, res, next) => {
     }
 })
 
-export { getOneProduct, getAllProducts, addProduct, updateProduct, uploadProdImages, prodImageUploader, deleteProduct }
+const createReview = catchAsync(async (req, res, next) => {
+    const productId = req.params.id;
+    const userId = req.user._id;
+    
+    // Check if the product exists
+    const product = await Product.findById(productId);
+    if (!product) {
+        return next(new AppError('No product found with that Id', 404));
+    }
+
+    // Check if the user has already reviewed the product
+    const alreadyReviewed = await Review.findOne({ user: userId, product: productId });
+    if (alreadyReviewed) {
+        return next(new AppError('Product already reviewed', 400));
+    }
+
+    const rating = Number(req.body.rating);
+    const comment = req.body.comment;
+
+    // Create the review document
+    const review = await Review.create({
+        user: userId,
+        product: productId,
+        rating: rating,
+        comment: comment
+    });
+
+    // Update the product's rating and numReviews
+    const totalRating = product.rating * product.numReviews;
+    const newTotalRating = totalRating + rating;
+    const newNumReviews = product.numReviews + 1;
+    const newAverageRating = newTotalRating / newNumReviews;
+
+    // Update the product with the new rating and numReviews
+    product.rating = newAverageRating;
+    product.numReviews = newNumReviews;
+    await product.save();
+
+    res.status(201).json({
+        status: 'success',
+        review: review
+    });
+});
+
+
+export {
+    getOneProduct,
+    getAllProducts,
+    addProduct,
+    updateProduct,
+    uploadProdImages,
+    prodImageUploader,
+    deleteProduct,
+    createReview
+}

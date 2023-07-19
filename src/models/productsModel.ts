@@ -75,6 +75,10 @@ const productsSchema: Schema = new Schema(
 
 const reviewsSchema: Schema = new Schema(
     {
+        product: {
+                type: Schema.Types.ObjectId,
+                ref: "Review",
+        },
         name: {
             type: String,
         },
@@ -85,12 +89,10 @@ const reviewsSchema: Schema = new Schema(
             type: Number,
             default: 0,
         },
-        user: [
-            {
+        user:{
                 type: Schema.Types.ObjectId,
                 ref: "User",
-            },
-        ],
+       },
     },
     {
         timestamps:true,
