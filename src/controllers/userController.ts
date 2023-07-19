@@ -56,7 +56,9 @@ const deleteUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     if (user) {
         if (user.isAdmin) return next(new AppError('Can delete user', 400));
         await User.deleteOne({ _id: req.params.id })
-        res.status(204)
+        res.status(204).json({
+            status:'success'
+        })
     } else {
         return next(new AppError('No user found', 404))
     }
