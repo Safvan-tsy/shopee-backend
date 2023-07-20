@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import multer, { StorageEngine, FileFilterCallback } from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 
+
 interface File {
     fieldname: string;
     originalname: string;
@@ -38,11 +39,16 @@ declare global {
     }
 }
 
-const getAllProducts = catchAsync(async (req, res, next) => {
-    const products = await Product.find()
+const  getAllProducts = catchAsync(async (req, res, next) => {
+    const limit = Number(req.query.limit)||10;
+    const page = Number(req.query.page)||1;
+    const products = await Product.find().limit(limit).skip(page * (page-1));
+    const count = await Product.countDocuments();
 
     res.status(200).json({
         status: 'success',
+        page,
+        pages:Math.ceil(count/limit),
         data: {
             products
         }
@@ -148,40 +154,34 @@ const deleteProduct = catchAsync(async (req, res, next) => {
 const createReview = catchAsync(async (req, res, next) => {
     const productId = req.params.id;
     const userId = req.user._id;
-    
+
     // Check if the product exists
     const product = await Product.findById(productId);
     if (!product) {
         return next(new AppError('No product found with that Id', 404));
     }
 
-    // Check if the user has already reviewed the product
-    const alreadyReviewed = await Review.find({ user: userId, product: productId });
+    // Check if this user has already reviewed this product
+    const alreadyReviewed = await Review.findOne({ product: productId, user: userId });
     if (alreadyReviewed) {
         return next(new AppError('Product already reviewed', 400));
     }
 
-    const rating = Number(req.body.rating);
-    const comment = req.body.comment;
-
-    // Create the review document
-    const review = await Review.create({
-        user: userId,
-        name:req.user.name,
+    // If not already reviewed, create the review
+    const { comment, rating } = req.body;
+    const review = new Review({
         product: productId,
-        rating: rating,
-        comment: comment
+        name:req.user.name,
+        comment,
+        rating,
+        user: userId
     });
 
-    // Update the product's rating and numReviews
-    const totalRating = product.rating * product.numReviews;
-    const newTotalRating = totalRating + rating;
-    const newNumReviews = product.numReviews + 1;
-    const newAverageRating = newTotalRating / newNumReviews;
+    await review.save();
 
-    // Update the product with the new rating and numReviews
-    product.rating = newAverageRating;
-    product.numReviews = newNumReviews;
+    product.reviews.push(review._id);
+    product.numReviews = product.reviews.length;
+    product.rating = (product.rating * (product.numReviews - 1) + rating) / product.numReviews;
     await product.save();
 
     res.status(201).json({
