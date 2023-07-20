@@ -1,9 +1,10 @@
 import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
-import { Product } from "../models/productsModel";
+import { Product ,Review} from "../models/productsModel";
 import { Request, Response, NextFunction } from 'express';
 import multer, { StorageEngine, FileFilterCallback } from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
+
 
 interface File {
     fieldname: string;
@@ -38,11 +39,16 @@ declare global {
     }
 }
 
-const getAllProducts = catchAsync(async (req, res, next) => {
-    const products = await Product.find()
+const  getAllProducts = catchAsync(async (req, res, next) => {
+    const limit = 2;
+    const page = Number(req.query.page)||1;
+    const products = await Product.find().limit(limit).skip(limit * (page-1));
+    const count = await Product.countDocuments();
 
     res.status(200).json({
         status: 'success',
+        page,
+        pages:Math.ceil(count/limit),
         data: {
             products
         }
@@ -145,4 +151,62 @@ const deleteProduct = catchAsync(async (req, res, next) => {
     }
 })
 
-export { getOneProduct, getAllProducts, addProduct, updateProduct, uploadProdImages, prodImageUploader, deleteProduct }
+const createReview = catchAsync(async (req, res, next) => {
+    const productId = req.params.id;
+    const userId = req.user._id;
+
+    // Check if the product exists
+    const product = await Product.findById(productId);
+    if (!product) {
+        return next(new AppError('No product found with that Id', 404));
+    }
+
+    // Check if this user has already reviewed this product
+    const alreadyReviewed = await Review.findOne({ product: productId, user: userId });
+    if (alreadyReviewed) {
+        return next(new AppError('Product already reviewed', 400));
+    }
+
+    // If not already reviewed, create the review
+    const { comment, rating } = req.body;
+    const review = new Review({
+        product: productId,
+        name:req.user.name,
+        comment,
+        rating,
+        user: userId
+    });
+
+    await review.save();
+
+    product.reviews.push(review._id);
+    product.numReviews = product.reviews.length;
+    product.rating = (product.rating * (product.numReviews - 1) + rating) / product.numReviews;
+    await product.save();
+
+    res.status(201).json({
+        status: 'success',
+        review: review
+    });
+});
+
+const getReviews = catchAsync(async (req, res, next) => {
+   const reviews = await Review.find({product:req.params.id})
+   res.status(200).json({
+    status:'success',
+    reviews
+   })
+})
+
+
+export {
+    getOneProduct,
+    getAllProducts,
+    addProduct,
+    updateProduct,
+    uploadProdImages,
+    prodImageUploader,
+    deleteProduct,
+    createReview,
+    getReviews
+}
