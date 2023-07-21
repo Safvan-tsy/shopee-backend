@@ -1,6 +1,6 @@
 import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
-import { Product ,Review} from "../models/productsModel";
+import { Product, Review } from "../models/productsModel";
 import { Request, Response, NextFunction } from 'express';
 import multer, { StorageEngine, FileFilterCallback } from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
@@ -39,16 +39,17 @@ declare global {
     }
 }
 
-const  getAllProducts = catchAsync(async (req, res, next) => {
+const getAllProducts = catchAsync(async (req, res, next) => {
     const limit = 2;
-    const page = Number(req.query.page)||1;
-    const products = await Product.find().limit(limit).skip(limit * (page-1));
-    const count = await Product.countDocuments();
+    const page = Number(req.query.page) || 1;
+    const keyword = req.query.keyword ? { name: { $regex: req.query.keyword } } : {};
+    const products = await Product.find({ ...keyword }).limit(limit).skip(limit * (page - 1));
+    const count = await Product.countDocuments({ ...keyword });
 
     res.status(200).json({
         status: 'success',
         page,
-        pages:Math.ceil(count/limit),
+        pages: Math.ceil(count / limit),
         data: {
             products
         }
@@ -171,7 +172,7 @@ const createReview = catchAsync(async (req, res, next) => {
     const { comment, rating } = req.body;
     const review = new Review({
         product: productId,
-        name:req.user.name,
+        name: req.user.name,
         comment,
         rating,
         user: userId
@@ -191,11 +192,11 @@ const createReview = catchAsync(async (req, res, next) => {
 });
 
 const getReviews = catchAsync(async (req, res, next) => {
-   const reviews = await Review.find({product:req.params.id})
-   res.status(200).json({
-    status:'success',
-    reviews
-   })
+    const reviews = await Review.find({ product: req.params.id })
+    res.status(200).json({
+        status: 'success',
+        reviews
+    })
 })
 
 
