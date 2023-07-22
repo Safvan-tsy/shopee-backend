@@ -9,7 +9,8 @@ import {
     uploadProdImages,
     deleteProduct,
     createReview,
-    getReviews
+    getReviews,
+    getTopProducts
 } from '../controllers/productsController';
 
 const router = express.Router()
@@ -24,6 +25,10 @@ router
     .post(protect, isAdmin, uploadProdImages, prodImageUploader)
 
 router
+    .route('/top')
+    .get(getTopProducts)
+
+router
     .route('/:id')
     .get(getOneProduct)
     .put(protect, isAdmin, updateProduct)
@@ -32,7 +37,7 @@ router
 router
     .route('/:id/review')
     .get(getReviews)
-    .post(protect,createReview)
+    .post(protect, createReview)
 
 
 export default router;
