@@ -40,7 +40,7 @@ declare global {
 }
 
 const getAllProducts = catchAsync(async (req, res, next) => {
-    const limit = 2;
+    const limit = 8;
     const page = Number(req.query.page) || 1;
     const keyword = req.query.keyword ? { name: { $regex: req.query.keyword } } : {};
     const products = await Product.find({ ...keyword }).limit(limit).skip(limit * (page - 1));
@@ -199,6 +199,14 @@ const getReviews = catchAsync(async (req, res, next) => {
     })
 })
 
+const getTopProducts = catchAsync(async (req, res, next) => {
+    const products = await Product.find().sort({rating:-1})
+
+    res.status(200).json({
+        status: "success",
+        products
+    })
+})
 
 export {
     getOneProduct,
@@ -209,5 +217,6 @@ export {
     prodImageUploader,
     deleteProduct,
     createReview,
-    getReviews
+    getReviews,
+    getTopProducts
 }
