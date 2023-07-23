@@ -11,25 +11,28 @@ process.on('uncaughtException', (err:Error) => {
 
 dotenv.config({ path: './.env' });
 
-const DB :string = process.env.MONGODB_URI;
-mongoose.connect(DB, {
-  dbName: process.env.DB_NAME,
-}).then(() => console.log("DB Connection Success"))
-
 cloudinary.config({
   cloud_name: "unfoldcloud",
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
-const port:number = Number(process.env.PORT) || 4000;
-const server = app.listen(port, () => {
-  console.log(`App running on port ${port}...`);
-});
 
-process.on('unhandledRejection', (err:any) => {
-  console.log('UNHANDLED REJECTION! 💥 Shutting down...');
-  console.log(err);
-  server.close(() => {
-    process.exit(1);
-  });
+const port:number = Number(process.env.PORT) || 4000;
+const DB :string = process.env.MONGODB_URI;
+
+mongoose.connect(DB, {
+  dbName: process.env.DB_NAME,
+}).then(() => {
+  app.listen(port, () => {
+      console.log("listening for requests");
+  })
 })
+
+
+// process.on('unhandledRejection', (err:any) => {
+//   console.log('UNHANDLED REJECTION! 💥 Shutting down...');
+//   console.log(err);
+//   server.close(() => {
+//     process.exit(1);
+//   });
+// })
