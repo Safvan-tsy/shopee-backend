@@ -3,8 +3,12 @@ import catchAsync from "../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
 import User from "../models/userModel";
 import { createSendToken } from "./authController";
+
 interface AuthenticatedRequest extends Request {
-    user?: any; // Replace `any` with the actual type of the `user` property
+    user?: any; 
+    headers: { [key: string]: string };
+    cookies: { [key: string]: string };
+    body: any; 
 }
 
 

@@ -6,6 +6,9 @@ import jwt from 'jsonwebtoken';
 
 interface AuthenticatedRequest extends Request {
     user?: any; // Replace `any` with the actual type of the `user` property
+    headers: { [key: string]: string };
+    cookies: { [key: string]: string };
+    body: any; // Replace `any` with the actual type of the `body` property
 }
 
 const signToken = (id: string) => {
