@@ -80,7 +80,7 @@ const updateUserById = catchAsync(async (req: Request, res: Response, next: Next
         new: true
     })
     if (!user) {
-        return next(new AppError('Uodating user failed', 400))
+        return next(new AppError('Updating user failed', 400))
     }
     res.status(200).json({
         status: 'success',
