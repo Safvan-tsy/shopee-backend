@@ -1,7 +1,7 @@
 import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
-import User from "../models/userModel";
+import User from "../models/user/userModel";
 import jwt from 'jsonwebtoken';
 
 interface AuthenticatedRequest extends Request {
