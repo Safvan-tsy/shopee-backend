@@ -19,13 +19,20 @@ const createSendToken = (user: any, seller: any, statusCode: number, res: Respon
     res.status(statusCode).json({
         status: 'success',
         token,
-        user,
-        seller
+        data: {
+            user,
+            seller
+        }
     });
 
 };
 const registerSeller = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user || !(await user.correctPasswords(req.body.password, user.password))) {
+
+        return next(new AppError('Incorrect password!', 404));
+    }
+
     if (user) {
         const seller = await User.create({
             userId: user._id,
