@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import { AuthenticatedRequest } from "../types/user";
 import User from "../models/user/userModel";
 import { signToken } from "./authController";
+import Seller from "../models/seller/sellerModel";
 
 const createSendToken = (user: any, seller: any, statusCode: number, res: Response) => {
     const token = signToken(user._id)
@@ -34,7 +35,7 @@ const registerSeller = catchAsync(async (req: AuthenticatedRequest, res: Respons
     }
 
     if (user) {
-        const seller = await User.create({
+        const seller = await Seller.create({
             userId: user._id,
             name: user.name,
             email: user.email,

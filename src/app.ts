@@ -25,7 +25,7 @@ app.options('*', cors());
 app.use('/api/product',productRouter);
 app.use('/api/user',userRouter);
 app.use('/api/orders/', orderRouter);
-app.use('api/seller',sellerRouter)
+app.use('/api/seller',sellerRouter)
 
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404))
