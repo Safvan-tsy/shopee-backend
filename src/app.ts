@@ -10,6 +10,7 @@ import errorHandler from './controllers/errorController';
 import productRouter from './routes/productRouter';
 import userRouter from './routes/userRouter';
 import orderRouter from './routes/orderRoutes';
+import sellerRouter from './routes/sellerRoutes';
 
 const app: Express = express();
 
@@ -24,6 +25,7 @@ app.options('*', cors());
 app.use('/api/product',productRouter);
 app.use('/api/user',userRouter);
 app.use('/api/orders/', orderRouter);
+app.use('/api/seller',sellerRouter)
 
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404))

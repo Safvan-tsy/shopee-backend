@@ -1,14 +1,11 @@
 import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
-import User from "../models/userModel";
+import User from "../models/user/userModel";
 import jwt from 'jsonwebtoken';
+import { AuthenticatedRequest } from "../types/user";
 
-interface AuthenticatedRequest extends Request {
-    user?: any; // Replace `any` with the actual type of the `user` property
-}
-
-const signToken = (id: string) => {
+export const signToken = (id: string) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRY
     });
@@ -72,14 +69,14 @@ const login = catchAsync(async (req: Request, res: Response, next: NextFunction)
 })
 
 const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    res.cookie('jwt','',{
-        httpOnly:true,
-        expires:new Date(0)
+    res.cookie('jwt', '', {
+        httpOnly: true,
+        expires: new Date(0)
     });
 
     res.status(200).json({
-        status:'success',
-        message:'logout success'
+        status: 'success',
+        message: 'logout success'
     })
 
 })
@@ -119,4 +116,20 @@ const isAdmin = catchAsync(async (req: AuthenticatedRequest, res: Response, next
 
 })
 
-export { isAdmin, protect, login, logout, signUp }
+const isSeller = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (req.user && req.user.isSeller) {
+        next();
+    } else {
+        return next(new AppError('not authorized Seller', 401))
+    }
+
+})
+
+export {
+    isAdmin,
+    protect,
+    login,
+    logout,
+    signUp,
+    isSeller
+}

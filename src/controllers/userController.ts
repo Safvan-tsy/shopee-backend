@@ -1,7 +1,7 @@
 import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
-import User from "../models/userModel";
+import User from "../models/user/userModel";
 import { createSendToken } from "./authController";
 interface AuthenticatedRequest extends Request {
     user?: any; // Replace `any` with the actual type of the `user` property

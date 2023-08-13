@@ -6,7 +6,8 @@ interface Users extends Document {
     image: string;
     email: string;
     password: string;
-    isAdmin: string;
+    isAdmin: boolean;
+    isSeller:boolean;
     correctPasswords(candidatePassword: string, userPassword: string): Promise<boolean>;
 }
 
@@ -38,6 +39,10 @@ const usersSchema: Schema = new Schema(
             }
         },
         isAdmin: {
+            type: Boolean,
+            default: false
+        },
+        isSeller: {
             type: Boolean,
             default: false
         }
