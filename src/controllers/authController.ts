@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import User from "../models/user/userModel";
 import jwt from 'jsonwebtoken';
 import { AuthenticatedRequest } from "../types/user";
+import Seller from "../models/seller/sellerModel";
 
 export const signToken = (id: string) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -11,7 +12,7 @@ export const signToken = (id: string) => {
     });
 };
 
-export const createSendToken = (user: any, statusCode: number, res: Response) => {
+export const createSendToken = (user: any,statusCode: number, res: Response,seller?:any) => {
     const token = signToken(user._id)
     const cookieOptions = {
         expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRY) * 24 * 60 * 60 * 1000),
@@ -26,7 +27,8 @@ export const createSendToken = (user: any, statusCode: number, res: Response) =>
         status: 'success',
         token,
         data: {
-            user
+            user,
+            seller
         }
     });
 
@@ -55,7 +57,7 @@ const login = catchAsync(async (req: Request, res: Response, next: NextFunction)
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return next(new AppError('Please provide email and password!', 400)); ////problem in App Error , not throwing error
+        return next(new AppError('Please provide email and password!', 400)); 
     }
 
     const user = await User.findOne({ email }).select('+password');
@@ -63,9 +65,12 @@ const login = catchAsync(async (req: Request, res: Response, next: NextFunction)
 
         return next(new AppError('Incorrect Email or password!', 404));
     }
-
-    createSendToken(user, 200, res);
-
+    const seller = await Seller.findOne({userId:user._id});
+    if(seller){
+        createSendToken(user,200,res,seller);
+    }else{
+        createSendToken(user, 200, res);
+    }
 })
 
 const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -113,7 +118,6 @@ const isAdmin = catchAsync(async (req: AuthenticatedRequest, res: Response, next
     } else {
         return next(new AppError('not authorized admin', 401))
     }
-
 })
 
 const isSeller = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -122,7 +126,6 @@ const isSeller = catchAsync(async (req: AuthenticatedRequest, res: Response, nex
     } else {
         return next(new AppError('not authorized Seller', 401))
     }
-
 })
 
 export {
