@@ -10,7 +10,7 @@ import errorHandler from './controllers/errorController';
 import productRouter from './routes/productRouter';
 import userRouter from './routes/userRouter';
 import orderRouter from './routes/orderRoutes';
-import sellerRouter from './routes/sellerRoutes';
+import sellerRouter from './routes/seller/sellerRoutes';
 
 const app: Express = express();
 

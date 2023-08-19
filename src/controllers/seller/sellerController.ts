@@ -1,10 +1,10 @@
-import AppError from "../utils/appError";
-import catchAsync from "../utils/catchAsync";
+import AppError from "../../utils/appError";
+import catchAsync from "../../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
-import { AuthenticatedRequest } from "../types/user";
-import User from "../models/user/userModel";
-import { signToken } from "./authController";
-import Seller from "../models/seller/sellerModel";
+import { AuthenticatedRequest } from "../../types/user";
+import User from "../../models/user/userModel";
+import { signToken } from "../authController";
+import Seller from "../../models/seller/sellerModel";
 
 const createSendToken = (user: any, seller: any, statusCode: number, res: Response) => {
     const token = signToken(user._id)

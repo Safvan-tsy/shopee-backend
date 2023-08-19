@@ -55,6 +55,9 @@ const ordersSchema: Schema = new Schema(
                 },
                 product: {
                     type: mongoose.Types.ObjectId
+                },
+                sellerId:{
+                    type: mongoose.Types.ObjectId
                 }
             }
         ],

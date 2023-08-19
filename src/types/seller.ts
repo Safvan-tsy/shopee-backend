@@ -12,3 +12,16 @@ export interface Sellers extends Document {
     pan: string;
     displayName: string;
 }
+
+export interface Sales extends Document {
+    _id:Types.ObjectId;
+    userId:Types.ObjectId;
+    name: string;
+    image: string;
+    email: string;
+    isAdmin: boolean;
+    isSeller:boolean;
+    phone: string;
+    pan: string;
+    displayName: string;
+}
