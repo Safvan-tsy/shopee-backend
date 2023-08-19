@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerSeller } from '../../controllers/sellerController';
+import { registerSeller } from '../../controllers/seller/sellerController';
 import {protect, isAdmin, isSeller} from '../../controllers/authController';
 
 const router = express.Router()
