@@ -13,6 +13,10 @@ const reviewsSchema: Schema = new Schema(
             type: Schema.Types.ObjectId,
             ref: "Product",
         },
+        sellerId: {
+            type: Schema.Types.ObjectId,
+            ref: "Seller"
+        },
         name: {
             type: String,
         },

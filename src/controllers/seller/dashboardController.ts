@@ -14,6 +14,8 @@ declare global {
 }
 
 const plates = catchAsync(async (req, res, next) => {
+    let totalOrders: number, totalDelivered: number, totalSales: number, walletBalance: number;
+    
 
 })
 
