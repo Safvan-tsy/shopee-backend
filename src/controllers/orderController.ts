@@ -35,7 +35,7 @@ const paymentIntent = catchAsync(async (req, res, next) => {
 });
 
 const addOrder = catchAsync(async (req, res, next) => {
-    const { orderItems,
+    const { orderItem,
         shippingAddress,
         paymentMethod,
         itemsPrice,
@@ -43,15 +43,9 @@ const addOrder = catchAsync(async (req, res, next) => {
         totalPrice,
         shippingPrice
     } = req.body;
-    if (orderItems && orderItems.length === 0) {
-        return next(new AppError('No order items provided', 400))
-    }
+
     const order = new Order({
-        orderItems: orderItems.map((x) => ({
-            ...x,
-            product: x._id,
-            _id: undefined
-        })),
+        orderItem,
         user: req.user._id,
         shippingAddress,
         paymentMethod,
@@ -64,9 +58,7 @@ const addOrder = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
         status: 'success',
-        data: {
-            order: createdOrder
-        }
+        order: createdOrder
     })
 
 })

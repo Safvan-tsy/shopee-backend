@@ -14,17 +14,22 @@ const salesSchema = new Schema(
             type: Number
         },
         orderId: {
-            type: String
+            type: Types.ObjectId
         },
         isDeliverd: {
-            type: String
+            type: Boolean
         },
-        phone: {
-            type: String
+        customerData: {
+            name: {
+                type: String
+            },
+            email: {
+                type: String
+            },
+            phone: {
+                type: String
+            }
         },
-        pan: {
-            type: String
-        }
     },
     {
         timestamps: true,
