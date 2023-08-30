@@ -1,10 +1,10 @@
 import express from 'express';
-import { signUp, login, logout, protect, isAdmin } from '../controllers/authController';
+import { signUp, login, logout, protect, isAdmin } from '@controllers/authController';
 import {
     addOrder, getMyOrders,
     getOrders, updateOrderToDelivered,
     updateOrderToPaid, getOrderById, paymentIntent,  
-} from '../controllers/orderController';
+} from '@controllers/orderController';
 
 const router = express.Router()
 

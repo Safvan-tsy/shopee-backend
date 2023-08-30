@@ -3,8 +3,8 @@ import {
     getAllUsers, getUserById,
     getUserProfile, updateUserById,
     updateUserProfile, deleteUser
-} from '../controllers/userController';
-import {signUp, login, logout, protect, isAdmin} from '../controllers/authController';
+} from '@controllers/userController';
+import {signUp, login, logout, protect, isAdmin} from '@controllers/authController';
 
 const router = express.Router()
 

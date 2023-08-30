@@ -8,8 +8,27 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "*": ["node_modules/*"]
+      "*": [
+        "node_modules/*"
+      ],
+      "@controllers/*": [
+        "src/controllers/*"
+      ],
+      "@models/*": [
+        "src/models/*"
+      ],
+      "@routes/*": [
+        "src/routes/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@typeStore/*": [
+        "src/types/*"
+      ]
     }
   },
-  "include": ["**/*.ts"]
+  "include": [
+    "**/*.ts"
+  ]
 }

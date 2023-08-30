@@ -1,6 +1,6 @@
-import Order from "../models/orderModel";
-import AppError from "../utils/appError";
-import catchAsync from "../utils/catchAsync";
+import Order from "@models/orderModel";
+import AppError from "@utils/appError";
+import catchAsync from "@utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
 import Stripe from "stripe";
 

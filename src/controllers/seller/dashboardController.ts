@@ -1,9 +1,9 @@
-import AppError from "../../utils/appError";
-import catchAsync from "../../utils/catchAsync";
+import AppError from "@utils/appError";
+import catchAsync from "@utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
-import { Users } from "../../types/user";
-import User from "../../models/user/userModel";
-import Seller from "../../models/seller/sellerModel";
+import { Users } from "@typeStore/user";
+import User from "@models/user/userModel";
+import Seller from "@models/seller/sellerModel";
 
 declare global {
     namespace Express {
