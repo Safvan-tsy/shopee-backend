@@ -1,7 +1,7 @@
-import AppError from "../utils/appError";
-import catchAsync from "../utils/catchAsync";
-import { Product } from "../models/product/productsModel";
-import { Review } from "../models/product/reviewModel";
+import AppError from "@utils/appError";
+import catchAsync from "@utils/catchAsync";
+import { Product } from "@models/product/productsModel";
+import { Review } from "@models/product/reviewModel";
 import { Request, Response, NextFunction } from 'express';
 import multer, { StorageEngine, FileFilterCallback } from 'multer';
 import { v2 as cloudinary } from 'cloudinary';

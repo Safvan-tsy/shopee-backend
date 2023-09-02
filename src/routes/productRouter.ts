@@ -1,5 +1,5 @@
 import express from 'express';
-import { protect, isAdmin } from '../controllers/authController';
+import { protect, isAdmin } from '@controllers/authController';
 import {
     getAllProducts,
     getOneProduct,
@@ -11,7 +11,7 @@ import {
     createReview,
     getReviews,
     getTopProducts
-} from '../controllers/productsController';
+} from '@controllers/productsController';
 
 const router = express.Router()
 
