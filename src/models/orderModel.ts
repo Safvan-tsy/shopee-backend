@@ -1,15 +1,10 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 interface Orders extends Document {
-    user: mongoose.Types.ObjectId;
-    orderItem: {
-        name: string;
-        qty: number;
-        image: string;
-        price: number;
-        product: mongoose.Types.ObjectId;
-        sellerId: mongoose.Types.ObjectId;
-    };
+    sellerId: mongoose.Types.ObjectId;
+    orderItems: {
+        prodId: mongoose.Types.ObjectId[]
+    },
     shippingAddress: {
         address: string;
         city: string;
@@ -35,28 +30,11 @@ interface Orders extends Document {
 
 const ordersSchema: Schema = new Schema(
     {
-        user: {
+        sellerId: {
             type: mongoose.Types.ObjectId
         },
-        orderItem: {
-            name: {
-                type: String
-            },
-            qty: {
-                type: Number
-            },
-            image: {
-                type: String
-            },
-            price: {
-                type: Number
-            },
-            product: {
-                type: mongoose.Types.ObjectId
-            },
-            sellerId: {
-                type: mongoose.Types.ObjectId
-            }
+        orderItems: {
+            prodId: [mongoose.Types.ObjectId]
         },
         shippingAddress: {
             address: {
@@ -69,7 +47,6 @@ const ordersSchema: Schema = new Schema(
             },
             postalCode: {
                 type: String,
-                required: true
             },
             country: {
                 type: String
