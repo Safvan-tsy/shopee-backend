@@ -1,12 +1,10 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
+import bcrypt from 'bcryptjs'
 import { Sellers } from "@typeStore/seller";
 
 
 const sellersSchema = new Schema(
     {
-        userId:{
-            type:Types.ObjectId
-        },
         name: {
             type: String,
             required: true,
@@ -17,6 +15,20 @@ const sellersSchema = new Schema(
         email: {
             type: String,
             required: true,
+        },
+        password: {
+            type: String,
+            required: [true, "please enter password"],
+            select: false
+        },
+        passwordConfirm: {
+            type: String,
+            validate: {
+                validator: function (el: string) {
+                    return el === this.password;
+                },
+                message: 'Passwords are not the same!'
+            }
         },
         isAdmin: {
             type: Boolean,
@@ -40,6 +52,17 @@ const sellersSchema = new Schema(
         timestamps: true,
     }
 );
+
+sellersSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    this.password = await bcrypt.hash(this.password, 12);
+    this.passwordConfirm = undefined;
+    next()
+})
+
+sellersSchema.methods.correctPasswords = async function (candidatePassword: string, userPassword: string): Promise<boolean> {
+    return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 const Seller = mongoose.model<Sellers>('sellers', sellersSchema);
 
