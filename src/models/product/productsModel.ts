@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 interface Products extends Document {
+    sellerId:mongoose.Types.ObjectId;
     name: string;
     image: string;
     brand: string;
@@ -11,18 +12,14 @@ interface Products extends Document {
     numReviews: number;
     price: number;
     countInStock: number;
-    user: mongoose.Types.ObjectId[];
-}
-
-interface Reviews extends Document {
-    name: string;
-    comment: string;
-    rating: number;
-    user: mongoose.Types.ObjectId[];
 }
 
 const productsSchema: Schema = new Schema(
     {
+        sellerId: {
+            type: Schema.Types.ObjectId,
+            ref: "Seller"
+        },
         name: {
             type: String,
             required: true,
@@ -39,12 +36,6 @@ const productsSchema: Schema = new Schema(
         description: {
             type: String,
         },
-        reviews: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: "Review",
-            },
-        ],
         rating: {
             type: Number,
             default: 0,
@@ -61,12 +52,10 @@ const productsSchema: Schema = new Schema(
             type: Number,
             default: 0,
         },
-        user: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: "User",
-            },
-        ],
+        orderCount: {
+            type: Number,
+            default: 0,
+        }
     },
     {
         timestamps:true,
@@ -76,4 +65,4 @@ const productsSchema: Schema = new Schema(
 
 const Product = mongoose.model<Products>('products', productsSchema);
 
-export { Product };
+export default Product ;

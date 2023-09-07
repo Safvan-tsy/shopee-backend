@@ -9,7 +9,7 @@ interface Reviews extends Document {
 
 const reviewsSchema: Schema = new Schema(
     {
-        product: {
+        productId: {
             type: Schema.Types.ObjectId,
             ref: "Product",
         },
@@ -28,8 +28,7 @@ const reviewsSchema: Schema = new Schema(
             default: 0,
         },
         user: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
+            type: String,
         },
     },
     {

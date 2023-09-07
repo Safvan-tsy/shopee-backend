@@ -1,10 +1,12 @@
 import mongoose, { Document, Schema } from "mongoose";
+import bcrypt from 'bcryptjs'
 
 interface Orders extends Document {
     sellerId: mongoose.Types.ObjectId;
-    orderItems: {
-        prodId: mongoose.Types.ObjectId[]
-    },
+    orderItems: mongoose.Types.ObjectId[];
+    user: string;
+    status:string;
+    statusDescription:string;
     shippingAddress: {
         address: string;
         city: string;
@@ -26,6 +28,8 @@ interface Orders extends Document {
     paidAt: Date;
     isDelivered: boolean;
     deliveredAt: Date;
+    otp:string;
+    correctOtp(candidateOtp: string, userOtp: string): Promise<boolean>;
 }
 
 const ordersSchema: Schema = new Schema(
@@ -33,8 +37,16 @@ const ordersSchema: Schema = new Schema(
         sellerId: {
             type: mongoose.Types.ObjectId
         },
-        orderItems: {
-            prodId: [mongoose.Types.ObjectId]
+        orderItems: [mongoose.Schema.Types.ObjectId],
+        user: {
+            type: String
+        },
+        status: {
+            type: String,
+            default:"In progress"
+        },
+        statusDescription: {
+            type: String,
         },
         shippingAddress: {
             address: {
@@ -99,11 +111,25 @@ const ordersSchema: Schema = new Schema(
         },
         deliveredAt: {
             type: Date
-        }
+        },
+        otp: {
+            type: String,
+            select: false
+        },
     }, {
     timestamps: true
 }
 );
+
+ordersSchema.pre('save', async function (next) {
+    if (!this.isModified('otp')) return next();
+    this.password = await bcrypt.hash(this.password, 12);
+    next()
+})
+
+ordersSchema.methods.correctOtp = async function (candidateOtp: string, userOtp: string): Promise<boolean> {
+    return await bcrypt.compare(candidateOtp, userOtp);
+};
 
 const Order = mongoose.model<Orders>("orders", ordersSchema);
 
