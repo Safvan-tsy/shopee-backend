@@ -6,8 +6,8 @@ import User from "@models/user/userModel";
 import { signToken } from "@controllers/authController";
 import Seller from "@models/seller/sellerModel";
 
-export const createSendToken = (seller: any,statusCode: number, res: Response) => {
-    const token = signToken(seller._id)
+const createSendToken = (user: any, seller: any, statusCode: number, res: Response) => {
+    const token = signToken(user._id)
     const cookieOptions = {
         expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRY) * 24 * 60 * 60 * 1000),
         httpOnly: false,
@@ -16,46 +16,56 @@ export const createSendToken = (seller: any,statusCode: number, res: Response) =
 
     res.cookie('jwt', token, cookieOptions)
 
-    seller.password = undefined;
+    user.password = undefined;
     res.status(statusCode).json({
         status: 'success',
         token,
-        seller,
+        data: {
+            user,
+            seller
+        }
     });
 
 };
-
 const registerSeller = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
 
-    const existingSeller = await Seller.findOne({ email: req.body.email });
-    if (existingSeller) return next(new AppError('user already exist, Try loging in!', 400))
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user || !(await user.correctPasswords(req.body.password, user.password))) {
+        return next(new AppError('Incorrect password!', 404));
+    }
 
-    const newSeller = await Seller.create(
-        {
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password,
-            passwordConfirm: req.body.passwordConfirm,
-            role: req.body.role,
-            isAdmin: req.body.isAdmin,
-            isSeller:req.body.isSeller,
-            displayName:req.body.displayName,
-            pan:req.body.pan,
-            phone:req.body.phone
-        }
-    )
+    if (user) {
+        const seller = await Seller.create({
+            userId: user._id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            isSeller: true,
+            displayName: req.body.displayName,
+            pan: req.body.pan,
+            phone: req.body.phone
+        })
 
-    createSendToken(newSeller, 201, res)
+        user.isSeller = true;
+        const updatedUser = await user.save();
+        createSendToken(updatedUser, seller, 200, res);
+    } else {
+        return next(new AppError('user profile fetching failed', 400))
+    }
 })
 
 const updateSeller = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const seller = await Seller.findById(req.user._id);
+    const seller = await Seller.findOne({userId:req.user._id});
     if (seller) {
-        const seller = await Seller.findByIdAndUpdate(req.params.id, req.body, {
+        const seller = await Seller.updateOne({userId:req.params.id}, req.body, {
             new: true,  
             runValidators: true
         })
-        createSendToken(seller, 201, res)
+        res.status(200).json({
+            status:"success",
+            seller
+        })
+     
     } else {
         return next(new AppError('Seller profile update failed', 400))
     }
@@ -63,9 +73,9 @@ const updateSeller = catchAsync(async (req: AuthenticatedRequest, res: Response,
 
 
 const deleteSeller = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const seller = await Seller.findById(req.user._id);
+    const seller = await Seller.findOne({userId:req.user._id});
     if (seller) {
-        await User.deleteOne({ _id: req.params.id })
+        await User.deleteOne( {userId:req.user._id});
         res.status(204).json({
             status:'success'
         })
@@ -75,7 +85,7 @@ const deleteSeller = catchAsync(async (req: AuthenticatedRequest, res: Response,
 })
 
 const getSellerProfile = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const seller = await Seller.findById(req.user._id);
+    const seller = await Seller.findOne({userId:req.user._id});
     if (seller) {
         res.status(200).json({
             status: 'success',

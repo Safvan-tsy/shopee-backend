@@ -2,6 +2,7 @@ import AppError from "@utils/appError";
 import catchAsync from "@utils/catchAsync";
 import Product from "@models/product/productsModel"
 import { APIFeatures } from "@utils/apiFeatures";
+import Seller from "@models/seller/sellerModel";
 
 declare global {
     namespace Express {
@@ -41,7 +42,8 @@ const getProductDetails = catchAsync(async (req, res, next) => {
 
 const updateProduct = catchAsync(async (req, res, next) => {
     const product = await Product.findById(req.params.id);
-    if (product.sellerId !== req.user._id) {
+    const seller = await Seller.findOne({userId:req.user._id});
+    if (product.sellerId !== seller._id) {
         return next(new AppError('You cant update that product', 400))
     }
     const updatedDoc = await Product.findByIdAndUpdate(req.params.id, req.body, {
@@ -57,7 +59,8 @@ const updateProduct = catchAsync(async (req, res, next) => {
 
 const deleteProduct = catchAsync(async (req, res, next) => {
     const product = await Product.findById(req.params.id)
-    if (product.sellerId == req.user._id) {
+    const seller = await Seller.findOne({userId:req.user._id});
+    if (product.sellerId == seller._id) {
         await Product.deleteOne({ _id: req.params.id });
         res.status(204).json({
             status: 'success',
@@ -69,7 +72,8 @@ const deleteProduct = catchAsync(async (req, res, next) => {
 })
 
 const createProduct = catchAsync(async (req, res, next) => {
-    req.body.sellerId = req.user._id;
+    // const seller = await Seller.findOne({userId:req.user._id});
+    // req.body.sellerId = seller._id;
     const product = await Product.create(req.body);
 
     if (!product) {

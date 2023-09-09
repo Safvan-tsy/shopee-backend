@@ -43,7 +43,8 @@ const getOrderDetails = catchAsync(async (req, res, next) => {
 
 const updateOrder = catchAsync(async (req, res, next) => {
     const order = await Order.findById(req.params.id);
-    if (order.sellerId !== req.user._id) {
+    const seller = await Seller.findOne({userId:req.user._id});
+    if (order.sellerId !== seller._id) {
         return next(new AppError('You cant update that order', 400))
     }
     const updatedDoc = await Order.findByIdAndUpdate(req.params.id, req.body, {
@@ -51,7 +52,7 @@ const updateOrder = catchAsync(async (req, res, next) => {
         runValidators: true
     })
 
-///// send mail to user
+    ///// send mail to user
 
     res.status(200).json({
         status: "success",
@@ -62,10 +63,17 @@ const updateOrder = catchAsync(async (req, res, next) => {
 const confirmDelivery = catchAsync(async (req, res, next) => {
     const otp = req.body.otp
     const order = await Order.findById(req.params.id).select('+otp');
-    if (!order || order.sellerId !== req.user._id ) return next(new AppError('order not found', 404))
+    if (!order || order.sellerId !== req.user._id) return next(new AppError('order not found', 404))
     if (!(await order.correctOtp(otp, order.otp))) return next(new AppError('Wrong otp', 400))
+    order.isDelivered = true
+    order.deliveredAt = new Date()
+    await order.save()
+    /////////// send mail to user0000
 
-        /////////// send mail to user0000
+    res.status(200).json({
+        status: "success",
+        order
+    })
 })
 
 const cancelOrder = catchAsync(async (req, res, next) => {

@@ -1,8 +1,10 @@
-import Order from "@models/orderModel";
+import Order, { Orders } from "@models/orderModel";
 import AppError from "@utils/appError";
 import catchAsync from "@utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
 import Stripe from "stripe";
+import jwt from 'jsonwebtoken';
+import { generateOTP } from "@utils/utils";
 
 declare global {
     namespace Express {
@@ -11,6 +13,12 @@ declare global {
         }
     }
 }
+
+const orderToken = (order:Orders) => {
+    return jwt.sign(order, process.env.JWT_SECRET, {
+        expiresIn: '15m'
+    });
+};
 
 const paymentIntent = catchAsync(async (req, res, next) => {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -62,6 +70,38 @@ const addOrder = catchAsync(async (req, res, next) => {
     })
 
 })
+
+const createOrder = catchAsync(async (req, res, next) => {
+    // add order data to jwt token with an expiry of 15 minutes
+    const otp = generateOTP()
+    req.body.otp = otp
+    const token = await orderToken(req.body)
+    
+    // send otp to email 
+    
+    res.status(200).json({
+        status: 'success',
+        token
+    });
+})
+
+const confirmOrder = catchAsync(async (req, res, next) => {
+    const {token,otp} = req.body;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.otp !== otp){
+        return next(new AppError('order confirmation failed', 400))
+    }
+    console.log(decoded)
+    decoded.otp = generateOTP()
+    const order = await Order.create(decoded);
+
+    res.status(200).json({
+        status:"success",
+        order
+    })
+
+})
+
 
 const getOrderById = catchAsync(async (req, res, next) => {
     const order = await Order.findById(req.params.id).populate('user', 'name email');
@@ -131,4 +171,14 @@ const getOrders = catchAsync(async (req, res, next) => {
 
 
 
-export { addOrder, getMyOrders, getOrderById, getOrders, updateOrderToDelivered, updateOrderToPaid, paymentIntent }
+export {
+    addOrder,
+    getMyOrders,
+    getOrderById,
+    getOrders,
+    updateOrderToDelivered,
+    updateOrderToPaid,
+    paymentIntent,
+    createOrder,
+    confirmOrder
+}

@@ -1,12 +1,20 @@
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from 'bcryptjs'
 
-interface Orders extends Document {
+export interface Orders extends Document {
+    userId: mongoose.Types.ObjectId;
     sellerId: mongoose.Types.ObjectId;
-    orderItems: mongoose.Types.ObjectId[];
-    user: string;
-    status:string;
-    statusDescription:string;
+    status: string;
+    statusDescription: string;
+    orderItems: [
+        {
+            name: string;
+            qty: number;
+            image: string;
+            price: number;
+            product: mongoose.Types.ObjectId
+        }
+    ];
     shippingAddress: {
         address: string;
         city: string;
@@ -28,26 +36,43 @@ interface Orders extends Document {
     paidAt: Date;
     isDelivered: boolean;
     deliveredAt: Date;
-    otp:string;
+    otp: string;
     correctOtp(candidateOtp: string, userOtp: string): Promise<boolean>;
 }
 
 const ordersSchema: Schema = new Schema(
     {
+        userId: {
+            type: mongoose.Types.ObjectId
+        },
         sellerId: {
             type: mongoose.Types.ObjectId
         },
-        orderItems: [mongoose.Schema.Types.ObjectId],
-        user: {
+        status: {
             type: String
         },
-        status: {
-            type: String,
-            default:"In progress"
-        },
         statusDescription: {
-            type: String,
+            type: String
         },
+        orderItems: [
+            {
+                name: {
+                    type: String
+                },
+                qty: {
+                    type: Number
+                },
+                image: {
+                    type: String
+                },
+                price: {
+                    type: Number
+                },
+                product: {
+                    type: mongoose.Types.ObjectId
+                }
+            }
+        ],
         shippingAddress: {
             address: {
                 type: String,
@@ -59,6 +84,7 @@ const ordersSchema: Schema = new Schema(
             },
             postalCode: {
                 type: String,
+                required: true
             },
             country: {
                 type: String
@@ -113,9 +139,8 @@ const ordersSchema: Schema = new Schema(
             type: Date
         },
         otp: {
-            type: String,
-            select: false
-        },
+            type: String
+        }
     }, {
     timestamps: true
 }

@@ -60,12 +60,18 @@ const login = catchAsync(async (req: Request, res: Response, next: NextFunction)
         return next(new AppError('Please provide email and password!', 400)); 
     }
 
-    const seller = await Seller.findOne({ email }).select('+password');
-    if (!seller || !(await seller.correctPasswords(password, seller.password))) {
+    const user = await User.findOne({ email }).select('+password');
+    
+    if (!user || !(await user.correctPasswords(password, user.password))) {
         return next(new AppError('Incorrect Email or password!', 404));
     }
-   
-    createSendToken(seller,200,res);
+
+    const seller = await Seller.findOne({userId:user._id});
+    if(seller){
+        createSendToken(user,200,res,seller);
+    }else{
+        createSendToken(user, 200, res);
+    }
 })
 
 const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -95,7 +101,7 @@ const protect = catchAsync(async (req: AuthenticatedRequest, res: Response, next
     if (token) {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            req.user = await Seller.findById(decoded.id)
+            req.user = await User.findById(decoded.id)
             next();
         } catch (error) {
             return next(new AppError('Not authorized, token verification failed', 401))
