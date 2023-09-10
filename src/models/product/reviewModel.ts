@@ -1,21 +1,29 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-interface Reviews extends Document {
+export interface Reviews extends Document {
+    productId: mongoose.Types.ObjectId
+    sellerId: mongoose.Types.ObjectId
+    userId: mongoose.Types.ObjectId
     name: string;
     comment: string;
     rating: number;
-    user: mongoose.Types.ObjectId[];
+    user?: mongoose.Types.ObjectId[];
 }
 
 const reviewsSchema: Schema = new Schema(
     {
         productId: {
             type: Schema.Types.ObjectId,
-            ref: "Product",
+            ref: "products",
         },
         sellerId: {
             type: Schema.Types.ObjectId,
             ref: "Seller"
+        },
+
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: "users"
         },
         name: {
             type: String,

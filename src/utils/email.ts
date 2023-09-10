@@ -1,6 +1,4 @@
 import nodemailer from 'nodemailer';
-import pug from 'pug';
-import htmlToText from 'html-to-text';
 
 interface User {
   email: string;
@@ -35,26 +33,51 @@ export class Email {
     
   }
   async send(template: string, subject: string) {
+    let html = '';
 
-    // const html = pug.renderFile(`${__dirname}/../../public/views/email/${template}.pug`, {
-    //     firstName: this.firstName,
-    //     otp: this.otp,
-    //     subject,
-    //   });
+    if (template === 'welcome') {
+      html = `
+      <html>
+      <body>
+        <div style="text-align: center;">
+        <h2>Hello ${this.firstName},</h2>
+        <p>Welcome to the shopee!</p>
+        </div>
+      </body>
+    </html>
+      `;
+    } else if (template === 'verification') {
+      html = `
+      <html>
+      <body>
+        <div style="text-align: center;">
+          <h1>Hello ${this.firstName},</h1>
+          <p>${subject}</p>
+          <b>${this.otp}</b>
+        </div>
+      </body>
+    </html>
+      `;
+    } else if (template === 'passwordReset') {
+      html = `
+        <p>Hello ${this.firstName},</p>
+        <p>Your password reset token (valid for only 10 minutes)</p>
+      `;
+    }
     
 
     const mailOptions: nodemailer.SendMailOptions = {
       from: this.from,
       to: this.to,
       subject,
-      text: "htmlToText.fromString(html)",
+      html,
     };
 
     await this.newTransport().sendMail(mailOptions);
   }
 
   async sendWelcome() {
-    await this.send('welcome', 'Welcome to the Natours Family!');
+    await this.send('welcome', 'Welcome to the Shopee !');
   }
 
   async sendDeliveryOtp() {

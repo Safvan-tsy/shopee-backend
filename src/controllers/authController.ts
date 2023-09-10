@@ -5,6 +5,7 @@ import User from "@models/user/userModel";
 import jwt from 'jsonwebtoken';
 import { AuthenticatedRequest } from "@typeStore/user";
 import Seller from "@models/seller/sellerModel";
+import { Email } from '@utils/email';
 
 export const signToken = (id: string) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -12,7 +13,7 @@ export const signToken = (id: string) => {
     });
 };
 
-export const createSendToken = (user: any,statusCode: number, res: Response,seller?:any) => {
+export const createSendToken = async(user: any,statusCode: number, res: Response,seller?:any) => {
     const token = signToken(user._id)
     const cookieOptions = {
         expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRY) * 24 * 60 * 60 * 1000),
@@ -22,6 +23,8 @@ export const createSendToken = (user: any,statusCode: number, res: Response,sell
 
     res.cookie('jwt', token, cookieOptions)
 
+    await new Email(user).sendWelcome()
+    
     user.password = undefined;
     res.status(statusCode).json({
         status: 'success',

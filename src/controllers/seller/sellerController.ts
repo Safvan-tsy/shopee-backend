@@ -35,6 +35,9 @@ const registerSeller = catchAsync(async (req: AuthenticatedRequest, res: Respons
     }
 
     if (user) {
+        const existingSeller = await Seller.findOne({ email: user.email });
+        if (existingSeller) return next(new AppError('seller already exist, Try loging in!', 400))
+
         const seller = await Seller.create({
             userId: user._id,
             name: user.name,
@@ -57,7 +60,7 @@ const registerSeller = catchAsync(async (req: AuthenticatedRequest, res: Respons
 const updateSeller = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const seller = await Seller.findOne({userId:req.user._id});
     if (seller) {
-        const seller = await Seller.updateOne({userId:req.params.id}, req.body, {
+        const seller = await Seller.updateOne({userId:req.user._id}, req.body, {
             new: true,  
             runValidators: true
         })

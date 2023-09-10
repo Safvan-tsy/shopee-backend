@@ -13,9 +13,10 @@ declare global {
 }
 
 const getProductList = catchAsync(async (req, res, next) => {
+    const seller = await Seller.findOne({userId:req.user._id});
     const qry = {
         ...req.query,
-        sellerId: req.user._id
+        sellerId: seller._id
     }
     const features = new APIFeatures(Product.find(), qry).limitFields().filter().sort().paginate();
     await features.countPages();
@@ -43,9 +44,10 @@ const getProductDetails = catchAsync(async (req, res, next) => {
 const updateProduct = catchAsync(async (req, res, next) => {
     const product = await Product.findById(req.params.id);
     const seller = await Seller.findOne({userId:req.user._id});
-    if (product.sellerId !== seller._id) {
-        return next(new AppError('You cant update that product', 400))
-    }
+
+    if (!product || !seller || product.sellerId.toString() !== seller._id.toString()) {
+        return next(new AppError('You can\'t update that product', 400));
+    }  
     const updatedDoc = await Product.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true
@@ -60,7 +62,7 @@ const updateProduct = catchAsync(async (req, res, next) => {
 const deleteProduct = catchAsync(async (req, res, next) => {
     const product = await Product.findById(req.params.id)
     const seller = await Seller.findOne({userId:req.user._id});
-    if (product.sellerId == seller._id) {
+    if (product.sellerId.toString() == seller._id.toString()) {
         await Product.deleteOne({ _id: req.params.id });
         res.status(204).json({
             status: 'success',
@@ -72,8 +74,8 @@ const deleteProduct = catchAsync(async (req, res, next) => {
 })
 
 const createProduct = catchAsync(async (req, res, next) => {
-    // const seller = await Seller.findOne({userId:req.user._id});
-    // req.body.sellerId = seller._id;
+    const seller = await Seller.findOne({userId:req.user._id});
+    req.body.sellerId = seller._id;
     const product = await Product.create(req.body);
 
     if (!product) {
@@ -86,7 +88,7 @@ const createProduct = catchAsync(async (req, res, next) => {
     });
 })
 
-export = {
+export {
     getProductDetails,
     getProductList,
     updateProduct,
