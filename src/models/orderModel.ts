@@ -139,7 +139,8 @@ const ordersSchema: Schema = new Schema(
             type: Date
         },
         otp: {
-            type: String
+            type: String,
+            select:false
         }
     }, {
     timestamps: true

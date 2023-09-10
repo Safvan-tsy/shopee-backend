@@ -5,6 +5,7 @@ import { AuthenticatedRequest } from "@typeStore/user";
 import Seller from "@models/seller/sellerModel";
 import Order from "@models/orderModel";
 import { APIFeatures } from "@utils/apiFeatures";
+import { Email } from "@utils/email";
 
 declare global {
     namespace Express {
@@ -60,6 +61,26 @@ const updateOrder = catchAsync(async (req, res, next) => {
     })
 })
 
+const sendDeliveryOtp = catchAsync(async (req, res, next) => {
+    // const order = await Order.findById(req.params.id).select('+otp');
+    // if (!order || order.sellerId !== req.user._id) return next(new AppError('order not found', 404))
+    // const user = await User.findById(order.userId)
+    const otp ='123456'
+    const user ={
+        name:"Safvan",
+        email:"safvanmanikulath@gmail.com"
+    }
+
+
+    await new Email(user,otp).sendDeliveryOtp()
+    /////////// send mail to user0000
+
+    res.status(200).json({
+        status: "success",
+        
+    })
+})
+
 const confirmDelivery = catchAsync(async (req, res, next) => {
     const otp = req.body.otp
     const order = await Order.findById(req.params.id).select('+otp');
@@ -93,10 +114,12 @@ const cancelOrder = catchAsync(async (req, res, next) => {
 
 })
 
-export = {
+
+export {
     getOrderDetails,
     getOrderList,
     updateOrder,
     confirmDelivery,
-    cancelOrder
-}
+    cancelOrder,
+    sendDeliveryOtp
+};
