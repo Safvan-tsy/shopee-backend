@@ -1,10 +1,20 @@
 import mongoose, { Document, Schema } from "mongoose";
+import bcrypt from 'bcryptjs'
 
-interface Orders extends Document {
+export interface Orders extends Document {
+    userId: mongoose.Types.ObjectId;
     sellerId: mongoose.Types.ObjectId;
-    orderItems: {
-        prodId: mongoose.Types.ObjectId[]
-    },
+    status: string;
+    statusDescription: string;
+    orderItems: [
+        {
+            name: string;
+            qty: number;
+            image: string;
+            price: number;
+            product: mongoose.Types.ObjectId
+        }
+    ];
     shippingAddress: {
         address: string;
         city: string;
@@ -26,16 +36,43 @@ interface Orders extends Document {
     paidAt: Date;
     isDelivered: boolean;
     deliveredAt: Date;
+    otp: string;
+    correctOtp(candidateOtp: string, userOtp: string): Promise<boolean>;
 }
 
 const ordersSchema: Schema = new Schema(
     {
+        userId: {
+            type: mongoose.Types.ObjectId
+        },
         sellerId: {
             type: mongoose.Types.ObjectId
         },
-        orderItems: {
-            prodId: [mongoose.Types.ObjectId]
+        status: {
+            type: String
         },
+        statusDescription: {
+            type: String
+        },
+        orderItems: [
+            {
+                name: {
+                    type: String
+                },
+                qty: {
+                    type: Number
+                },
+                image: {
+                    type: String
+                },
+                price: {
+                    type: Number
+                },
+                product: {
+                    type: mongoose.Types.ObjectId
+                }
+            }
+        ],
         shippingAddress: {
             address: {
                 type: String,
@@ -47,6 +84,7 @@ const ordersSchema: Schema = new Schema(
             },
             postalCode: {
                 type: String,
+                required: true
             },
             country: {
                 type: String
@@ -99,11 +137,25 @@ const ordersSchema: Schema = new Schema(
         },
         deliveredAt: {
             type: Date
+        },
+        otp: {
+            type: String,
+            select:false
         }
     }, {
     timestamps: true
 }
 );
+
+ordersSchema.pre('save', async function (next) {
+    if (!this.isModified('otp')) return next();
+    this.password = await bcrypt.hash(this.password, 12);
+    next()
+})
+
+ordersSchema.methods.correctOtp = async function (candidateOtp: string, userOtp: string): Promise<boolean> {
+    return await bcrypt.compare(candidateOtp, userOtp);
+};
 
 const Order = mongoose.model<Orders>("orders", ordersSchema);
 

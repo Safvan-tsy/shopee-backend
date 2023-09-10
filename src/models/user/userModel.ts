@@ -65,4 +65,4 @@ usersSchema.methods.correctPasswords = async function (candidatePassword: string
 
 const User = mongoose.model<Users>('users', usersSchema);
 
-export default User
+export default User;

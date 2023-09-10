@@ -1,15 +1,23 @@
 import express from 'express';
-import { signUp, login, logout, protect, isAdmin } from '@controllers/authController';
+import { protect, isAdmin } from '@controllers/authController';
 import {
-    addOrder, getMyOrders,
-    getOrders, updateOrderToDelivered,
-    updateOrderToPaid, getOrderById, paymentIntent,  
+    getMyOrders,
+    getOrders, 
+    updateOrderToDelivered,
+    updateOrderToPaid, 
+    getOrderById, 
+    paymentIntent, 
+    createOrder,
 } from '@controllers/orderController';
 
 const router = express.Router()
 
-router.route('/').get(protect, isAdmin, getOrders).post(protect, addOrder)
-router.post('/secret', paymentIntent );
+router
+    .route('/')
+    .get(protect, isAdmin, getOrders)
+    .post(protect, createOrder)
+
+router.post('/secret', paymentIntent);
 router.route('/mine').get(protect, getMyOrders)
 router.route('/:id').get(protect, isAdmin, getOrderById)
 router.route('/:id/pay').put(protect, updateOrderToPaid)

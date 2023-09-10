@@ -1,8 +1,10 @@
-import Order from "@models/orderModel";
+import Order, { Orders } from "@models/orderModel";
 import AppError from "@utils/appError";
 import catchAsync from "@utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
 import Stripe from "stripe";
+import jwt from 'jsonwebtoken';
+import { generateOTP } from "@utils/utils";
 
 declare global {
     namespace Express {
@@ -34,34 +36,20 @@ const paymentIntent = catchAsync(async (req, res, next) => {
     });
 });
 
-const addOrder = catchAsync(async (req, res, next) => {
-    const { orderItem,
-        shippingAddress,
-        paymentMethod,
-        itemsPrice,
-        taxPrice,
-        totalPrice,
-        shippingPrice
-    } = req.body;
-
-    const order = new Order({
-        orderItem,
-        user: req.user._id,
-        shippingAddress,
-        paymentMethod,
-        itemsPrice,
-        taxPrice,
-        totalPrice,
-        shippingPrice
-    })
-    const createdOrder = await order.save();
-
+const createOrder = catchAsync(async (req, res, next) => {
+    // add order data to jwt token with an expiry of 15 minutes
+    const otp = generateOTP()
+    req.body.otp = otp
+    const order = await Order.create(req.body)
+    
+    // send otp to email 
+    
     res.status(200).json({
         status: 'success',
-        order: createdOrder
-    })
-
+        order
+    });
 })
+
 
 const getOrderById = catchAsync(async (req, res, next) => {
     const order = await Order.findById(req.params.id).populate('user', 'name email');
@@ -131,4 +119,12 @@ const getOrders = catchAsync(async (req, res, next) => {
 
 
 
-export { addOrder, getMyOrders, getOrderById, getOrders, updateOrderToDelivered, updateOrderToPaid, paymentIntent }
+export {
+    getMyOrders,
+    getOrderById,
+    getOrders,
+    updateOrderToDelivered,
+    updateOrderToPaid,
+    paymentIntent,
+    createOrder
+}
