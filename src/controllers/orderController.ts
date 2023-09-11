@@ -39,7 +39,7 @@ const paymentIntent = catchAsync(async (req, res, next) => {
 const createOrder = catchAsync(async (req, res, next) => {
     // add order data to jwt token with an expiry of 15 minutes
     const otp = generateOTP()
-    req.body.otp = otp
+    req.body.otp =  otp.toString();
     const order = await Order.create(req.body)
     
     // send otp to email 

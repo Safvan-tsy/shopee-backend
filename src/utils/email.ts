@@ -63,7 +63,19 @@ export class Email {
         <p>Hello ${this.firstName},</p>
         <p>Your password reset token (valid for only 10 minutes)</p>
       `;
-    }
+    }else if (template === 'delivered') {
+      html = `
+      <html>
+      <body>
+        <div style="text-align: center;">
+          <h1>Hello ${this.firstName},</h1>
+          <p>${subject}</p>
+          <b> Thank you for shopping whith us !</b>
+        </div>
+      </body>
+    </html>
+      `;
+    } 
     
 
     const mailOptions: nodemailer.SendMailOptions = {
@@ -94,4 +106,12 @@ export class Email {
       'Your password reset token (valid for only 10 minutes)'
     );
   }
+
+  async sendOrderDelivered() {
+    await this.send(
+      'delivered',
+      'Your order has been delivered !'
+    );
+  }
+
 }

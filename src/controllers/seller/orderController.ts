@@ -6,6 +6,7 @@ import Seller from "@models/seller/sellerModel";
 import Order from "@models/orderModel";
 import { APIFeatures } from "@utils/apiFeatures";
 import { Email } from "@utils/email";
+import User from "@models/user/userModel";
 
 declare global {
     namespace Express {
@@ -16,9 +17,10 @@ declare global {
 }
 
 const getOrderList = catchAsync(async (req, res, next) => {
+    const seller = await Seller.findOne({userId:req.user._id});
     const qry = {
         ...req.query,
-        sellerId: req.user._id
+        sellerId: seller._id
     }
     const features = new APIFeatures(Order.find(), qry).limitFields().filter().sort().paginate();
     await features.countPages();
@@ -45,7 +47,7 @@ const getOrderDetails = catchAsync(async (req, res, next) => {
 const updateOrder = catchAsync(async (req, res, next) => {
     const order = await Order.findById(req.params.id);
     const seller = await Seller.findOne({userId:req.user._id});
-    if (order.sellerId !== seller._id) {
+    if (order.sellerId.toString() !== seller._id.toString()) {
         return next(new AppError('You cant update that order', 400))
     }
     const updatedDoc = await Order.findByIdAndUpdate(req.params.id, req.body, {
@@ -62,17 +64,14 @@ const updateOrder = catchAsync(async (req, res, next) => {
 })
 
 const sendDeliveryOtp = catchAsync(async (req, res, next) => {
-    // const order = await Order.findById(req.params.id).select('+otp');
-    // if (!order || order.sellerId !== req.user._id) return next(new AppError('order not found', 404))
-    // const user = await User.findById(order.userId)
-    const otp ='123456'
-    const user ={
-        name:"Safvan",
-        email:"safvanmanikulath@gmail.com"
-    }
+    const seller = await Seller.findOne({userId:req.user._id});
+    const order = await Order.findById(req.params.id).select('+otp');
+    
+    if (!order || order.sellerId.toString() !== seller._id.toString()) return next(new AppError('order not found', 404))
+    const user = await User.findById(order.userId)
 
 
-    await new Email(user,otp).sendDeliveryOtp()
+    await new Email(user,order.otp).sendDeliveryOtp()
     /////////// send mail to user0000
 
     res.status(200).json({
@@ -83,13 +82,18 @@ const sendDeliveryOtp = catchAsync(async (req, res, next) => {
 
 const confirmDelivery = catchAsync(async (req, res, next) => {
     const otp = req.body.otp
+    const seller = await Seller.findOne({userId:req.user._id});
     const order = await Order.findById(req.params.id).select('+otp');
-    if (!order || order.sellerId !== req.user._id) return next(new AppError('order not found', 404))
-    if (!(await order.correctOtp(otp, order.otp))) return next(new AppError('Wrong otp', 400))
+    const user = await User.findById(order.userId)
+
+    if (!order || order.sellerId.toString() !== seller._id.toString()) return next(new AppError('order not found', 404))
+    if (otp !== order.otp) return next(new AppError('Wrong otp', 400))
+
     order.isDelivered = true
     order.deliveredAt = new Date()
     await order.save()
-    /////////// send mail to user0000
+
+    await new Email(user).sendOrderDelivered()
 
     res.status(200).json({
         status: "success",
@@ -98,8 +102,10 @@ const confirmDelivery = catchAsync(async (req, res, next) => {
 })
 
 const cancelOrder = catchAsync(async (req, res, next) => {
+    const seller = await Seller.findOne({userId:req.user._id});
     const order = await Order.findById(req.params.id);
-    if (!order || order.sellerId !== req.user._id) return next(new AppError('order not found', 404))
+
+    if (!order || order.sellerId.toString() !== seller._id.toString()) return next(new AppError('order not found', 404))
     order.status = "Cancelled"
     order.statusDescription = req.body.reason
 
