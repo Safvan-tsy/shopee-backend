@@ -5,6 +5,9 @@ import { Request, Response, NextFunction } from "express";
 import Stripe from "stripe";
 import jwt from 'jsonwebtoken';
 import { generateOTP } from "@utils/utils";
+import Product from "@models/product/productsModel";
+import { Email } from "@utils/email";
+import User from "@models/user/userModel";
 
 declare global {
     namespace Express {
@@ -37,10 +40,35 @@ const paymentIntent = catchAsync(async (req, res, next) => {
 });
 
 const createOrder = catchAsync(async (req, res, next) => {
-    // add order data to jwt token with an expiry of 15 minutes
+    
     const otp = generateOTP()
     req.body.otp =  otp.toString();
     const order = await Order.create(req.body)
+
+     for (const orderItem of order.orderItems) {
+        const product = await Product.findById(orderItem.product);
+
+        if (product) {
+            if (product.countInStock >= orderItem.qty) {
+                product.countInStock -= orderItem.qty;
+                await product.save();
+            } else {
+                // cancel order and send mail
+                const user = await User.findById(order.userId)
+                order.status = "Cancelled"
+                order.statusDescription = "Due to product out of stock"
+                await order.save();
+                await new Email(user).sendOrderCancelled()
+                return next(new AppError('Failed to place order', 400))
+            }
+        } 
+        // else {
+        //     // Handle the case where the product is not found.
+        //     // can choose to cancel the order or take appropriate action here.
+        //     console.log(`Product not found for ID: ${orderItem.product}`);
+        // }
+    }
+
     
     // send otp to email 
     

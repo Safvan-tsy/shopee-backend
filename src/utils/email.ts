@@ -75,6 +75,18 @@ export class Email {
       </body>
     </html>
       `;
+    }else if (template === 'cancelled') {
+      html = `
+      <html>
+      <body>
+        <div style="text-align: center;">
+          <h1>Hello ${this.firstName},</h1>
+          <b> ${subject}</b>
+          <p> We are really sorry to inform you that due to some issues your order has been cancelled . please try again after some time </p>
+        </div>
+      </body>
+    </html>
+      `;
     } 
     
 
@@ -111,6 +123,13 @@ export class Email {
     await this.send(
       'delivered',
       'Your order has been delivered !'
+    );
+  }
+
+  async sendOrderCancelled(){
+    await this.send(
+      'cancelled',
+      'Your order has been Cancelled !'
     );
   }
 
