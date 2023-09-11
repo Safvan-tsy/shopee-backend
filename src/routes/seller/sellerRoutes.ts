@@ -7,6 +7,7 @@ import {
 } from '@controllers/seller/sellerController';
 import { protect, isAdmin, isSeller } from '@controllers/authController';
 import {
+  cancelOrder,
   confirmDelivery,
   getOrderDetails,
   getOrderList,
@@ -35,10 +36,10 @@ router
   .route('/orders/:id')
   .get(protect, isSeller, getOrderDetails)
   .put(protect, isSeller, updateOrder)
-  .patch(protect, isSeller, sendDeliveryOtp)
+  .patch(protect, isSeller, cancelOrder)
 
-router.get('/orders/:id/confirm', protect, isSeller, confirmDelivery);
-router.get('/orders/:id/send-otp', protect, isSeller, sendDeliveryOtp);
+router.post('/orders/confirm/:id', protect, isSeller, confirmDelivery);
+router.get('/orders/send-otp/:id', protect, isSeller, sendDeliveryOtp);
 
 router
   .route('/products/:id')

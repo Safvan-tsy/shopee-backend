@@ -63,7 +63,31 @@ export class Email {
         <p>Hello ${this.firstName},</p>
         <p>Your password reset token (valid for only 10 minutes)</p>
       `;
-    }
+    }else if (template === 'delivered') {
+      html = `
+      <html>
+      <body>
+        <div style="text-align: center;">
+          <h1>Hello ${this.firstName},</h1>
+          <p>${subject}</p>
+          <b> Thank you for shopping whith us !</b>
+        </div>
+      </body>
+    </html>
+      `;
+    }else if (template === 'cancelled') {
+      html = `
+      <html>
+      <body>
+        <div style="text-align: center;">
+          <h1>Hello ${this.firstName},</h1>
+          <b> ${subject}</b>
+          <p> We are really sorry to inform you that due to some issues your order has been cancelled . please try again after some time </p>
+        </div>
+      </body>
+    </html>
+      `;
+    } 
     
 
     const mailOptions: nodemailer.SendMailOptions = {
@@ -94,4 +118,19 @@ export class Email {
       'Your password reset token (valid for only 10 minutes)'
     );
   }
+
+  async sendOrderDelivered() {
+    await this.send(
+      'delivered',
+      'Your order has been delivered !'
+    );
+  }
+
+  async sendOrderCancelled(){
+    await this.send(
+      'cancelled',
+      'Your order has been Cancelled !'
+    );
+  }
+
 }

@@ -37,7 +37,6 @@ export interface Orders extends Document {
     isDelivered: boolean;
     deliveredAt: Date;
     otp: string;
-    correctOtp(candidateOtp: string, userOtp: string): Promise<boolean>;
 }
 
 const ordersSchema: Schema = new Schema(
@@ -92,7 +91,6 @@ const ordersSchema: Schema = new Schema(
         },
         paymentMethod: {
             type: String,
-            required: true
         },
         paymentResult: {
             id: {
@@ -147,15 +145,15 @@ const ordersSchema: Schema = new Schema(
 }
 );
 
-ordersSchema.pre('save', async function (next) {
-    if (!this.isModified('otp')) return next();
-    this.password = await bcrypt.hash(this.password, 12);
-    next()
-})
+// ordersSchema.pre('save', async function (next) {
+//     if (!this.isModified('otp')) return next();
+//     this.otp = await bcrypt.hash(this.otp, 12);
+//     next()
+// })
 
-ordersSchema.methods.correctOtp = async function (candidateOtp: string, userOtp: string): Promise<boolean> {
-    return await bcrypt.compare(candidateOtp, userOtp);
-};
+// ordersSchema.methods.correctOtp = async function (candidateOtp: string, userOtp: string): Promise<boolean> {
+//     return await bcrypt.compare(candidateOtp, userOtp);
+// };
 
 const Order = mongoose.model<Orders>("orders", ordersSchema);
 
