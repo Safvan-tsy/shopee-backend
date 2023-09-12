@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc --project ./",
     "start:dev": "nodemon server.ts",
-    "start": "npm run build && node dist/server.js",
+    "start": "node dist/server.js",
     "test": "jest"
   },
   "author": "Safvan-tsy",
