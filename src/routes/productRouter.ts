@@ -5,8 +5,6 @@ import {
     getOneProduct,
     addProduct,
     updateProduct,
-    prodImageUploader,
-    uploadProdImages,
     deleteProduct,
     createReview,
     getReviews,
@@ -22,7 +20,7 @@ router
 
 router
     .route('/image')
-    .post(protect, isAdmin, uploadProdImages, prodImageUploader)
+    .post(protect, isAdmin)
 
 router
     .route('/top')

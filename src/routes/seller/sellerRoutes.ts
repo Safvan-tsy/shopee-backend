@@ -19,7 +19,9 @@ import {
   deleteProduct,
   getProductDetails,
   getProductList,
-  updateProduct
+  prodImageUploader,
+  updateProduct,
+  uploadProdImages
 } from '@controllers/seller/productsController';
 
 const router = express.Router();
@@ -40,6 +42,10 @@ router
 
 router.post('/orders/confirm/:id', protect, isSeller, confirmDelivery);
 router.get('/orders/send-otp/:id', protect, isSeller, sendDeliveryOtp);
+
+router
+    .route('/products/image')
+    .post(protect, isSeller, uploadProdImages, prodImageUploader)
 
 router
   .route('/products/:id')

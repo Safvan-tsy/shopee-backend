@@ -3,6 +3,34 @@ import catchAsync from "@utils/catchAsync";
 import Product from "@models/product/productsModel"
 import { APIFeatures } from "@utils/apiFeatures";
 import Seller from "@models/seller/sellerModel";
+import { Request} from 'express';
+import multer, { StorageEngine, FileFilterCallback } from 'multer';
+import { v2 as cloudinary } from 'cloudinary';
+
+
+interface File {
+    fieldname: string;
+    originalname: string;
+    encoding: string;
+    mimetype: string;
+    destination: string;
+    filename: string;
+    path: string;
+    size: number;
+}
+
+const multerStorage: StorageEngine = multer.diskStorage({});
+const multerFilter = (req: Request, file: File, cb: FileFilterCallback) => {
+    if (file.mimetype.startsWith('image')) {
+        cb(null, true);
+    } else {
+        cb(new AppError('Not an image! Please upload only images.', 400), false);
+    }
+};
+const upload = multer({
+    storage: multerStorage,
+    fileFilter: multerFilter
+});
 
 declare global {
     namespace Express {
@@ -11,6 +39,37 @@ declare global {
         }
     }
 }
+
+
+const uploadProdImages = upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'imageCover', maxCount: 1 },
+    { name: 'images', maxCount: 3 }
+])
+const prodImageUploader = catchAsync(async (req, res, next) => {
+    if (!req.files.imageCover) { return next(new AppError('No mage found', 400)) }
+
+    const response = await cloudinary.uploader.upload(req.files.imageCover[0].path, {
+        folder: 'products', public_id: `prod-${req.user.id}-${Date.now()}-cover`
+    });
+    req.body.imageCover = response.secure_url;
+
+    req.body.images = [];
+    if (req.files.images) {
+        await Promise.all(
+            req.files.images.map(async (file, i) => {
+                const response = await cloudinary.uploader.upload(file.path, { folder: 'products', public_id: `prod-${req.user.id}-${Date.now()}-${i + 1}` });
+
+                req.body.images.push(response.secure_url);
+            })
+        );
+    }
+    res.status(200).json({
+        status: 'success',
+        image: req.body.imageCover,
+        images: req.body.images
+    })
+})
 
 const getProductList = catchAsync(async (req, res, next) => {
     const seller = await Seller.findOne({userId:req.user._id});
@@ -93,5 +152,7 @@ export {
     getProductList,
     updateProduct,
     deleteProduct,
-    createProduct
+    createProduct,
+    uploadProdImages,
+    prodImageUploader
 }

@@ -17,7 +17,7 @@ export class Email {
     this.firstName = user.name.split(' ')[0];
     this.url = url;
     this.otp = otp
-    this.from = `Shopee <${process.env.EMAIL_FROM}>`;
+    this.from = `Shorpe <${process.env.EMAIL_FROM}>`;
   }
 
   private newTransport() {
@@ -41,7 +41,7 @@ export class Email {
       <body>
         <div style="text-align: center;">
         <h2>Hello ${this.firstName},</h2>
-        <p>Welcome to the shopee!</p>
+        <p>Welcome to the shorpee!</p>
         </div>
       </body>
     </html>
@@ -101,7 +101,7 @@ export class Email {
   }
 
   async sendWelcome() {
-    await this.send('welcome', 'Welcome to the Shopee !');
+    await this.send('welcome', 'Welcome to the Shorpee !');
   }
 
   async sendDeliveryOtp() {

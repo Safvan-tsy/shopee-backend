@@ -17,12 +17,12 @@ const createSendToken = (user: any, seller: any, statusCode: number, res: Respon
     res.cookie('jwt', token, cookieOptions)
 
     user.password = undefined;
+    user.seller = seller;
     res.status(statusCode).json({
         status: 'success',
         token,
         data: {
-            user,
-            seller
+            user
         }
     });
 

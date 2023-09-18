@@ -22,16 +22,14 @@ export const createSendToken = async(user: any,statusCode: number, res: Response
     };
 
     res.cookie('jwt', token, cookieOptions)
-
-    await new Email(user).sendWelcome()
     
     user.password = undefined;
+    user.seller = seller;
     res.status(statusCode).json({
         status: 'success',
         token,
         data: {
             user,
-            seller
         }
     });
 
@@ -53,6 +51,7 @@ const signUp = catchAsync(async (req: Request, res: Response, next: NextFunction
         }
     )
 
+    await new Email(newUser).sendWelcome()
     createSendToken(newUser, 201, res)
 })
 
