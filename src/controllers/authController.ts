@@ -24,12 +24,14 @@ export const createSendToken = async(user: any,statusCode: number, res: Response
     res.cookie('jwt', token, cookieOptions)
     
     user.password = undefined;
-    user.seller = seller;
+
+    console.log(seller)
     res.status(statusCode).json({
         status: 'success',
         token,
         data: {
             user,
+            seller
         }
     });
 
