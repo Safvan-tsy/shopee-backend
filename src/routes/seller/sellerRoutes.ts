@@ -1,11 +1,12 @@
 import express from 'express';
+import { login, logout, protect, isSeller } from '@controllers/seller/authController';
 import {
   deleteSeller,
   getSellerProfile,
   registerSeller,
   updateSeller
 } from '@controllers/seller/sellerController';
-import { protect, isAdmin, isSeller } from '@controllers/authController';
+
 import {
   cancelOrder,
   confirmDelivery,
@@ -44,8 +45,8 @@ router.post('/orders/confirm/:id', protect, isSeller, confirmDelivery);
 router.get('/orders/send-otp/:id', protect, isSeller, sendDeliveryOtp);
 
 router
-    .route('/products/image')
-    .post(protect, isSeller, uploadProdImages, prodImageUploader)
+  .route('/products/image')
+  .post(protect, isSeller, uploadProdImages, prodImageUploader)
 
 router
   .route('/products/:id')
@@ -63,6 +64,15 @@ router
   .put(protect, isSeller, updateSeller)
   .delete(protect, isSeller, deleteSeller)
   .get(protect, isSeller, getSellerProfile)
+
+router
+  .route('/auth/login')
+  .post(login)
+
+router
+  .route('/auth/logout')
+  .post(logout)
+
 
 
 export default router;
