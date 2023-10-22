@@ -25,7 +25,7 @@ const productsSchema: Schema = new Schema(
             required: true,
         },
         image: {
-            type: String,
+            type: [String],
         },
         brand: {
             type: String,
@@ -52,9 +52,21 @@ const productsSchema: Schema = new Schema(
             type: Number,
             default: 0,
         },
+        status: {
+            type: String,
+        },
         orderCount: {
             type: Number,
             default: 0,
+        },
+        delivery:{
+            type:String
+        },
+        districts:{
+            type:Array
+        },
+        pincodes:{
+            type:Array
         }
     },
     {
