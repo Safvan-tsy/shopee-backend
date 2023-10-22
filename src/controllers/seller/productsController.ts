@@ -133,16 +133,19 @@ const deleteProduct = catchAsync(async (req, res, next) => {
 })
 
 const createProduct = catchAsync(async (req, res, next) => {
-    const seller = await Seller.findOne({userId:req.user._id});
+    console.log(req.user)
+    const seller = req.user;
+    console.log(seller)
     req.body.sellerId = seller._id;
     const product = await Product.create(req.body);
 
+    console.log(product)
     if (!product) {
         return next(new AppError('Product not created', 400));
     }
 
     res.status(201).json({
-        status: 'Product created successfully',
+        status: 'success',
         product
     });
 })
