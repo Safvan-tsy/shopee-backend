@@ -72,7 +72,7 @@ const prodImageUploader = catchAsync(async (req, res, next) => {
 })
 
 const getProductList = catchAsync(async (req, res, next) => {
-    const seller = await Seller.findOne({userId:req.user._id});
+    const seller = req.user;
     const qry = {
         ...req.query,
         sellerId: seller._id
@@ -102,7 +102,7 @@ const getProductDetails = catchAsync(async (req, res, next) => {
 
 const updateProduct = catchAsync(async (req, res, next) => {
     const product = await Product.findById(req.params.id);
-    const seller = await Seller.findOne({userId:req.user._id});
+    const seller = req.user;
 
     if (!product || !seller || product.sellerId.toString() !== seller._id.toString()) {
         return next(new AppError('You can\'t update that product', 400));
@@ -120,7 +120,7 @@ const updateProduct = catchAsync(async (req, res, next) => {
 
 const deleteProduct = catchAsync(async (req, res, next) => {
     const product = await Product.findById(req.params.id)
-    const seller = await Seller.findOne({userId:req.user._id});
+    const seller = req.user;
     if (product.sellerId.toString() == seller._id.toString()) {
         await Product.deleteOne({ _id: req.params.id });
         res.status(204).json({
@@ -133,13 +133,10 @@ const deleteProduct = catchAsync(async (req, res, next) => {
 })
 
 const createProduct = catchAsync(async (req, res, next) => {
-    console.log(req.user)
     const seller = req.user;
-    console.log(seller)
     req.body.sellerId = seller._id;
     const product = await Product.create(req.body);
 
-    console.log(product)
     if (!product) {
         return next(new AppError('Product not created', 400));
     }
