@@ -17,7 +17,7 @@ declare global {
 }
 
 const getOrderList = catchAsync(async (req, res, next) => {
-    const seller = await Seller.findOne({userId:req.user._id});
+    const seller = req.user
     const qry = {
         ...req.query,
         sellerId: seller._id
@@ -46,7 +46,7 @@ const getOrderDetails = catchAsync(async (req, res, next) => {
 
 const updateOrder = catchAsync(async (req, res, next) => {
     const order = await Order.findById(req.params.id);
-    const seller = await Seller.findOne({userId:req.user._id});
+    const seller = req.user
     if (order.sellerId.toString() !== seller._id.toString()) {
         return next(new AppError('You cant update that order', 400))
     }
@@ -64,7 +64,7 @@ const updateOrder = catchAsync(async (req, res, next) => {
 })
 
 const sendDeliveryOtp = catchAsync(async (req, res, next) => {
-    const seller = await Seller.findOne({userId:req.user._id});
+    const seller = req.user
     const order = await Order.findById(req.params.id).select('+otp');
     
     if (!order || order.sellerId.toString() !== seller._id.toString()) return next(new AppError('order not found', 404))
@@ -82,7 +82,7 @@ const sendDeliveryOtp = catchAsync(async (req, res, next) => {
 
 const confirmDelivery = catchAsync(async (req, res, next) => {
     const otp = req.body.otp
-    const seller = await Seller.findOne({userId:req.user._id});
+    const seller = req.user
     const order = await Order.findById(req.params.id).select('+otp');
     const user = await User.findById(order.userId)
 
@@ -102,7 +102,7 @@ const confirmDelivery = catchAsync(async (req, res, next) => {
 })
 
 const cancelOrder = catchAsync(async (req, res, next) => {
-    const seller = await Seller.findOne({userId:req.user._id});
+    const seller = req.user
     const order = await Order.findById(req.params.id);
 
     if (!order || order.sellerId.toString() !== seller._id.toString()) return next(new AppError('order not found', 404))
