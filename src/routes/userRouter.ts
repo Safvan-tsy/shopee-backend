@@ -2,7 +2,7 @@ import express from 'express';
 import {
     getAllUsers, getUserById,
     getUserProfile, updateUserById,
-    updateUserProfile, deleteUser
+    updateUserProfile, deleteUser, getCarts, addCart
 } from '@controllers/userController';
 import {signUp, login, logout, protect, isAdmin} from '@controllers/authController';
 
@@ -22,6 +22,11 @@ router
     .route('/profile')
     .get(protect,getUserProfile)
     .put(protect,updateUserProfile)
+
+router
+    .route('/cart')
+    .get(protect,getCarts)
+    .post(protect,addCart)
 
 router
     .route('/:id')
