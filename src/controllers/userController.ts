@@ -94,13 +94,13 @@ const updateUserById = catchAsync(async (req: Request, res: Response, next: Next
 
 const addCart = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-    const qry ={
+    const qry = {
         userId: req.user._id,
         sellerId: req.body.sellerId,
     }
     const existingCart = await Cart.findOne(qry)
-    req.body.itemsPrice = req.body.price*req.body.qty
-    req.body.taxPrice =(req.body.itemsPrice/100)*4
+    req.body.itemsPrice = req.body.price * req.body.qty
+    req.body.taxPrice = (req.body.itemsPrice / 100) * 4
     req.body.totalPrice = req.body.itemsPrice + req.body.taxPrice + req.body.shippingPrice;
 
     if (existingCart) {
@@ -116,15 +116,20 @@ const addCart = catchAsync(async (req: Request, res: Response, next: NextFunctio
             totalPrice: req.body.totalPrice,
         }
         existingCart.orderItems.push(newItem)
-        // existingCart.cartTotal= existingCart.
+        let cartTotal = 0;
+        for (const item of existingCart.orderItems) {
+            cartTotal += item.totalPrice;
+        }
+        existingCart.cartTotal = cartTotal
+
         await existingCart.save()
         res.status(201).json({
-            status:"success",
-            cart:existingCart
+            status: "success",
+            cart: existingCart
         })
     }
-    req.body.itemsPrice = req.body.price*req.body.qty
-    req.body.taxPrice =(req.body.itemsPrice/100)*4
+    req.body.itemsPrice = req.body.price * req.body.qty
+    req.body.taxPrice = (req.body.itemsPrice / 100) * 4
     req.body.totalPrice = req.body.itemsPrice + req.body.taxPrice + req.body.shippingPrice;
 
     const cartData = {
@@ -145,7 +150,7 @@ const addCart = catchAsync(async (req: Request, res: Response, next: NextFunctio
             }
         ],
         paymentMethod: "COD",
-        cartTotal:req.body.totalPrice,
+        cartTotal: req.body.totalPrice,
         isPaid: false,
         paidAt: undefined,
         isDelivered: false,
@@ -158,8 +163,19 @@ const addCart = catchAsync(async (req: Request, res: Response, next: NextFunctio
             cart
         })
 })
-const getCart = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const getCarts = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const cart = await Cart.find({ userId: req.user._id })
 
+    if(!cart){
+        res.status(400).json({
+            status:"Failed"
+        })
+    }
+
+    res.status(200).json({
+        status: "success",
+        cart
+    })
 })
 
 export {
@@ -169,6 +185,6 @@ export {
     updateUserProfile,
     updateUserById,
     deleteUser,
-    getCart,
+    getCarts,
     addCart
 }
