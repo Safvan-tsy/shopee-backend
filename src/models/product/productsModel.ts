@@ -11,6 +11,7 @@ interface Products extends Document {
     rating: number;
     numReviews: number;
     price: number;
+    shippingPrice:number;
     countInStock: number;
 }
 
@@ -67,6 +68,9 @@ const productsSchema: Schema = new Schema(
         },
         pincodes:{
             type:Array
+        },
+        shippingPrice:{
+            type:Number
         }
     },
     {
