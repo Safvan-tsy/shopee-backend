@@ -93,89 +93,91 @@ const updateUserById = catchAsync(async (req: Request, res: Response, next: Next
 })
 
 const addCart = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-
     const qry = {
         userId: req.user._id,
         sellerId: req.body.sellerId,
     }
-    const existingCart = await Cart.findOne(qry)
-    req.body.itemsPrice = req.body.price * req.body.qty
-    req.body.taxPrice = (req.body.itemsPrice / 100) * 4
-    req.body.totalPrice = req.body.itemsPrice + req.body.taxPrice + req.body.shippingPrice;
+
+    const existingCart = await Cart.findOne(qry);
+
+    const itemPrice = req.body.price * req.body.qty;
+    const taxPrice = (itemPrice / 100) * 4;
+    const totalPrice = itemPrice + taxPrice + req.body.shippingPrice;
+
+    const newItem = {
+        name: req.body.productName,
+        qty: req.body.qty,
+        image: req.body.productImage,
+        price: req.body.price,
+        productId: req.body.productId,
+        itemsPrice: itemPrice,
+        taxPrice: taxPrice,
+        shippingPrice: req.body.shippingPrice,
+        totalPrice: totalPrice,
+    }
 
     if (existingCart) {
-        const newItem = {
-            name: req.body.productName,
-            qty: req.body.qty,
-            image: req.body.ProductImage,
-            price: req.body.price,
-            productId: req.body.productId,
-            itemsPrice: req.body.itemsPrice,
-            taxPrice: req.body.taxPrice,
-            shippingPrice: req.body.shippingPrice,
-            totalPrice: req.body.totalPrice,
-        }
-        existingCart.orderItems.push(newItem)
+        const existingItem = existingCart.orderItems.find(item => item.productId == req.body.productId);
+
+            if (existingItem) {
+                existingItem.qty += req.body.qty;
+                existingItem.itemsPrice += itemPrice;
+                existingItem.taxPrice += taxPrice;
+                existingItem.totalPrice += (totalPrice - req.body.shippingPrice);
+                await existingCart.save()
+            } else {
+                existingCart.orderItems.push(newItem);
+            }
+
         let cartTotal = 0;
         for (const item of existingCart.orderItems) {
             cartTotal += item.totalPrice;
         }
-        existingCart.cartTotal = cartTotal
 
-        await existingCart.save()
+        existingCart.cartTotal = cartTotal;
+
+        await existingCart.save();
+
         res.status(201).json({
             status: "success",
             cart: existingCart
-        })
-    }
-    req.body.itemsPrice = req.body.price * req.body.qty
-    req.body.taxPrice = (req.body.itemsPrice / 100) * 4
-    req.body.totalPrice = req.body.itemsPrice + req.body.taxPrice + req.body.shippingPrice;
+        });
+    } else {
+        const cartData = {
+            userId: req.user._id,
+            sellerId: req.body.sellerId,
+            status: "Open",
+            orderItems: [newItem],
+            paymentMethod: "COD",
+            cartTotal: totalPrice,
+            isPaid: false,
+            paidAt: undefined,
+            isDelivered: false,
+            deliveredAt: undefined,
+        }
 
-    const cartData = {
-        userId: req.user._id,
-        sellerId: req.body.sellerId,
-        status: "Open",
-        orderItems: [
-            {
-                name: req.body.productName,
-                qty: req.body.qty,
-                image: req.body.ProductImage,
-                price: req.body.price,
-                productId: req.body.productId,
-                itemsPrice: req.body.itemsPrice,
-                taxPrice: req.body.taxPrice,
-                shippingPrice: req.body.shippingPrice,
-                totalPrice: req.body.totalPrice
-            }
-        ],
-        paymentMethod: "COD",
-        cartTotal: req.body.totalPrice,
-        isPaid: false,
-        paidAt: undefined,
-        isDelivered: false,
-        deliveredAt: undefined,
-    }
-    const cart = await Cart.create(cartData)
-    res.status(201)
-        .json({
+        const cart = await Cart.create(cartData);
+
+        res.status(201).json({
             status: "success",
             cart
-        })
+        });
+    }
 })
 const getCarts = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const cart = await Cart.find({ userId: req.user._id })
+    const cart = await Cart.find({ userId: req.user._id });
 
-    if(!cart){
-        res.status(400).json({
-            status:"Failed"
-        })
+    if (!cart || cart.length<1) {
+        res.status(404).json({
+            status: "Failed",
+            message: "Cart not found",
+        });
+    } else {
+        res.status(200).json({
+            status: "success",
+            cart,
+        });
     }
-
-    res.status(200).json({
-        status: "success",
-        cart
-    })
 })
 
 export {
