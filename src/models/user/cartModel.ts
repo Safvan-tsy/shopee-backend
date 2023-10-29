@@ -17,19 +17,19 @@ export interface CartType extends Document {
             totalPrice: number;
         }
     ];
-    shippingAddress: {
-        address: string;
-        city: string;
-        postalCode: string;
-        state:string;
-        country: string
-    };
-    paymentMethod: string;
     cartTotal: number;
-    isPaid: boolean;
-    paidAt: Date;
-    isDelivered: boolean;
-    deliveredAt: Date;
+    shippingAddress?: {
+        address?: string;
+        city?: string;
+        postalCode?: string;
+        state?: string;
+        country?: string
+    };
+    paymentMethod?: string;
+    isPaid?: boolean;
+    paidAt?: Date;
+    isDelivered?: boolean;
+    deliveredAt?: Date;
 }
 
 const cartsSchema: Schema = new Schema(
@@ -59,21 +59,37 @@ const cartsSchema: Schema = new Schema(
                 },
                 productId: {
                     type: mongoose.Types.ObjectId
-                }
+                },
+                itemsPrice: {
+                    type: Number,
+                    default: 0.0
+                },
+                taxPrice: {
+                    type: Number,
+                    default: 0.0
+                },
+                shippingPrice: {
+                    type: Number,
+                    default: 0.0
+                },
+                totalPrice: {
+                    type: Number,
+                    default: 0.0
+                },
             }
         ],
+        cartTotal:{
+            type:Number
+        },
         shippingAddress: {
             address: {
                 type: String,
-                required: true
             },
             city: {
                 type: String,
-                required: true
             },
             postalCode: {
                 type: String,
-                required: true
             },
             state: {
                 type: String
@@ -84,22 +100,6 @@ const cartsSchema: Schema = new Schema(
         },
         paymentMethod: {
             type: String,
-        },
-        itemsPrice: {
-            type: Number,
-            default: 0.0
-        },
-        taxPrice: {
-            type: Number,
-            default: 0.0
-        },
-        shippingPrice: {
-            type: Number,
-            default: 0.0
-        },
-        totalPrice: {
-            type: Number,
-            default: 0.0
         },
         isPaid: {
             type: Boolean,
