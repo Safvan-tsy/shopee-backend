@@ -15,13 +15,25 @@ import sellerRouter from '@routes/seller/sellerRoutes';
 
 const app: Express = express();
 
+const corsOptions = {
+    origin: [
+        'http://localhost:3000',
+        'http://localhost:4000',
+        'https://shopee-frontend-sigma.vercel.app',
+        'https://shopee-frontend-git-main-safvan-tsy.vercel.app',
+        'https://shorpe-seller-git-main-safvan-tsy.vercel.app',
+        '*',
+    ],
+    credentials: true,
+    optionSuccessStatus: 200
+}
+
 app.use(helmet());
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(cookieParser());
 app.use(mongoSanitize());
-app.use(cors());
-app.options('*', cors());
+app.use(cors(corsOptions));             // Enable CORS 
 
 app.use('/api/product',productRouter);
 app.use('/api/user',userRouter);
