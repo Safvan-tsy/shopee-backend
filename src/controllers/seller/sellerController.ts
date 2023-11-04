@@ -49,11 +49,12 @@ const registerSeller = catchAsync(async (req: AuthenticatedRequest, res: Respons
             phone: req.body.phone
         })
 
+
         user.isSeller = true;
         const updatedUser = await user.save();
         createSendToken(updatedUser, seller, 200, res);
     } else {
-        return next(new AppError('user profile fetching failed', 400))
+        return next(new AppError('failed', 400))
     }
 })
 

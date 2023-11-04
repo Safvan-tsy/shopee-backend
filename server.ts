@@ -12,7 +12,7 @@ process.on('uncaughtException', (err:Error) => {
 dotenv.config({ path: './.env' });
 
 cloudinary.config({
-  cloud_name: "unfoldcloud",
+  cloud_name: "safvan",
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
