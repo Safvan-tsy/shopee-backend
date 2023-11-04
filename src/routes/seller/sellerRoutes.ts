@@ -1,5 +1,6 @@
 import express from 'express';
 import { login, logout, protect, isSeller } from '@controllers/seller/authController';
+import {protect as userProtect} from '@controllers/authController';
 import {
   deleteSeller,
   getSellerProfile,
@@ -27,7 +28,7 @@ import {
 
 const router = express.Router();
 
-router.route('/register').post(protect, registerSeller);
+router.route('/register').post(userProtect, registerSeller);
 
 // router.get('/dashboard/plates', protect, isSeller);
 // router.get('/dashboard/graph', protect, isSeller);
