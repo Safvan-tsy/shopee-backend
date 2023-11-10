@@ -1,16 +1,28 @@
 import express from 'express';
 import {
-    getAllUsers, getUserById,
-    getUserProfile, updateUserById,
-    updateUserProfile, deleteUser, getCarts, addCart
+    getAllUsers,
+    getUserById,
+    getUserProfile,
+    updateUserById,
+    updateUserProfile,
+    deleteUser,
+    getCarts,
+    addCart,
+    deleteCart
 } from '@controllers/userController';
-import {signUp, login, logout, protect, isAdmin} from '@controllers/authController';
+import {
+    signUp,
+    login,
+    logout,
+    protect,
+    isAdmin
+} from '@controllers/authController';
 
 const router = express.Router()
 
 router
     .route('/')
-    .get(protect,isAdmin,getAllUsers)
+    .get(protect, isAdmin, getAllUsers)
 
 router
     .route('/signup')
@@ -20,18 +32,22 @@ router.post('/logout', logout)
 router.post('/login', login)
 router
     .route('/profile')
-    .get(protect,getUserProfile)
-    .put(protect,updateUserProfile)
+    .get(protect, getUserProfile)
+    .put(protect, updateUserProfile)
 
 router
     .route('/cart')
-    .get(protect,getCarts)
-    .post(protect,addCart)
+    .get(protect, getCarts)
+    .post(protect, addCart)
+
+router
+    .route('/cart/:id')
+    .delete(protect, deleteCart)
 
 router
     .route('/:id')
-    .get(protect,isAdmin,getUserById)
-    .put(protect,isAdmin,updateUserById)
-    .delete(protect,isAdmin,deleteUser)
+    .get(protect, isAdmin, getUserById)
+    .put(protect, isAdmin, updateUserById)
+    .delete(protect, isAdmin, deleteUser)
 
 export default router;
