@@ -119,15 +119,15 @@ const addCart = catchAsync(async (req: Request, res: Response, next: NextFunctio
     if (existingCart) {
         const existingItem = existingCart.orderItems.find(item => item.productId == req.body.productId);
 
-            if (existingItem) {
-                existingItem.qty += req.body.qty;
-                existingItem.itemsPrice += itemPrice;
-                existingItem.taxPrice += taxPrice;
-                existingItem.totalPrice += (totalPrice - req.body.shippingPrice);
-                await existingCart.save()
-            } else {
-                existingCart.orderItems.push(newItem);
-            }
+        if (existingItem) {
+            existingItem.qty += req.body.qty;
+            existingItem.itemsPrice += itemPrice;
+            existingItem.taxPrice += taxPrice;
+            existingItem.totalPrice += (totalPrice - req.body.shippingPrice);
+            await existingCart.save()
+        } else {
+            existingCart.orderItems.push(newItem);
+        }
 
         let cartTotal = 0;
         for (const item of existingCart.orderItems) {
@@ -167,7 +167,7 @@ const addCart = catchAsync(async (req: Request, res: Response, next: NextFunctio
 const getCarts = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const cart = await Cart.find({ userId: req.user._id });
 
-    if (!cart || cart.length<1) {
+    if (!cart || cart.length < 1) {
         res.status(404).json({
             status: "Failed",
             message: "Cart not found",
@@ -180,6 +180,15 @@ const getCarts = catchAsync(async (req: Request, res: Response, next: NextFuncti
     }
 })
 
+const deleteCart = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const deletedItem = await Cart.findByIdAndDelete(req.params.id)
+    if (!deletedItem) return next(new AppError('Delete failed , check id', 400))
+
+    res.status(204).json({
+        status: "success"
+    })
+})
+
 export {
     getAllUsers,
     getUserById,
@@ -188,5 +197,6 @@ export {
     updateUserById,
     deleteUser,
     getCarts,
-    addCart
+    addCart,
+    deleteCart
 }
