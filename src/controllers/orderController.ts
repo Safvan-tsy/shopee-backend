@@ -42,7 +42,7 @@ const paymentIntent = catchAsync(async (req, res, next) => {
 const createOrder = catchAsync(async (req, res, next) => {
     
     const otp = generateOTP()
-    req.body.otp =  otp.toString();
+    
     const order = await Order.create(req.body)
 
      for (const orderItem of order.orderItems) {

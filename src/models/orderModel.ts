@@ -12,31 +12,26 @@ export interface Orders extends Document {
             qty: number;
             image: string;
             price: number;
-            product: mongoose.Types.ObjectId
+            product: mongoose.Types.ObjectId,
+            itemsPrice: number;
+            taxPrice: number;
+            shippingPrice: number;
+            totalPrice: number;
         }
     ];
+    cartTotal: number;
     shippingAddress: {
         address: string;
         city: string;
         postalCode: string;
+        state: string;
         country: string
     };
-    paymentMethod: string;
-    paymentResult: {
-        id: string;
-        status: string;
-        updateTime: string;
-        email: string
-    };
-    itemsPrice: number;
-    taxPrice: number;
-    shippingPrice: number;
-    totalPrice: number;
-    isPaid: boolean;
-    paidAt: Date;
-    isDelivered: boolean;
-    deliveredAt: Date;
-    otp: string;
+    paymentMethod?: string;
+    isPaid?: boolean;
+    paidAt?: Date;
+    isDelivered?: boolean;
+    deliveredAt?: Date;
 }
 
 const ordersSchema: Schema = new Schema(
@@ -69,21 +64,40 @@ const ordersSchema: Schema = new Schema(
                 },
                 product: {
                     type: mongoose.Types.ObjectId
-                }
+                },
+                itemsPrice: {
+                    type: Number,
+                    default: 0.0
+                },
+                taxPrice: {
+                    type: Number,
+                    default: 0.0
+                },
+                shippingPrice: {
+                    type: Number,
+                    default: 0.0
+                },
+                totalPrice: {
+                    type: Number,
+                    default: 0.0
+                },
             }
         ],
+        cartTotal: {
+            type: Number
+        },
         shippingAddress: {
             address: {
                 type: String,
-                required: true
             },
             city: {
                 type: String,
-                required: true
             },
             postalCode: {
                 type: String,
-                required: true
+            },
+            state: {
+                type: String
             },
             country: {
                 type: String
@@ -91,36 +105,6 @@ const ordersSchema: Schema = new Schema(
         },
         paymentMethod: {
             type: String,
-        },
-        paymentResult: {
-            id: {
-                type: String
-            },
-            status: {
-                type: String
-            },
-            updateTime: {
-                type: String
-            },
-            email: {
-                type: String
-            }
-        },
-        itemsPrice: {
-            type: Number,
-            default: 0.0
-        },
-        taxPrice: {
-            type: Number,
-            default: 0.0
-        },
-        shippingPrice: {
-            type: Number,
-            default: 0.0
-        },
-        totalPrice: {
-            type: Number,
-            default: 0.0
         },
         isPaid: {
             type: Boolean,
@@ -135,10 +119,6 @@ const ordersSchema: Schema = new Schema(
         },
         deliveredAt: {
             type: Date
-        },
-        otp: {
-            type: String,
-            select:false
         }
     }, {
     timestamps: true
