@@ -71,8 +71,8 @@ const sendDeliveryOtp = catchAsync(async (req, res, next) => {
     const user = await User.findById(order.userId)
 
 
-    await new Email(user,order.otp).sendDeliveryOtp()
-    /////////// send mail to user0000
+    // await new Email(user,order.otp).sendDeliveryOtp()
+    // /////////// send mail to user0000
 
     res.status(200).json({
         status: "success",
@@ -87,7 +87,7 @@ const confirmDelivery = catchAsync(async (req, res, next) => {
     const user = await User.findById(order.userId)
 
     if (!order || order.sellerId.toString() !== seller._id.toString()) return next(new AppError('order not found', 404))
-    if (otp !== order.otp) return next(new AppError('Wrong otp', 400))
+    // if (otp !== order.otp) return next(new AppError('Wrong otp', 400))
 
     order.isDelivered = true
     order.deliveredAt = new Date()
