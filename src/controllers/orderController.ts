@@ -93,7 +93,7 @@ const getOrderById = catchAsync(async (req, res, next) => {
 })
 
 const getMyOrders = catchAsync(async (req, res, next) => {
-    const orders = await Order.find({ user: req.user._id })
+    const orders = await Order.find({ userId: req.user._id })
     res.status(200).json({
         status: 'success',
         orders
