@@ -1,5 +1,4 @@
 import mongoose, { Document, Schema } from "mongoose";
-import bcrypt from 'bcryptjs'
 
 export interface Orders extends Document {
     userId: mongoose.Types.ObjectId;

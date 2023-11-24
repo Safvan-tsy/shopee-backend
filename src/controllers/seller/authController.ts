@@ -12,7 +12,7 @@ export const signToken = (id: string) => {
     });
 };
 
-export const createSendToken = async(seller: any,statusCode: number, res: Response) => {
+export const createSendToken = async (seller: any, statusCode: number, res: Response) => {
     const token = signToken(seller._id)
     const cookieOptions = {
         expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRY) * 24 * 60 * 60 * 1000),
@@ -36,22 +36,22 @@ const login = catchAsync(async (req: Request, res: Response, next: NextFunction)
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return next(new AppError('Please provide email and password!', 400)); 
+        return next(new AppError('Please provide email and password!', 400));
     }
 
     const user = await User.findOne({ email }).select('+password');
-    
+
     if (!user || !(await user.correctPasswords(password, user.password))) {
         return next(new AppError('Incorrect Email or password!', 404));
     }
 
-    const seller = await Seller.findOne({userId:user._id});
-    if(seller){
-        createSendToken(seller,200,res);
-    }else{
+    const seller = await Seller.findOne({ userId: user._id });
+    if (seller) {
+        createSendToken(seller, 200, res);
+    } else {
         res.status(403).json({
-            status:"Fail",
-            message:"Not Authorized"
+            status: "Fail",
+            message: "Not Authorized"
         })
     }
 })

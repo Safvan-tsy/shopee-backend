@@ -2,8 +2,7 @@ import AppError from "@utils/appError";
 import catchAsync from "@utils/catchAsync";
 import Product from "@models/product/productsModel"
 import { APIFeatures } from "@utils/apiFeatures";
-import Seller from "@models/seller/sellerModel";
-import { Request} from 'express';
+import { Request } from 'express';
 import multer, { StorageEngine, FileFilterCallback } from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 
@@ -106,7 +105,7 @@ const updateProduct = catchAsync(async (req, res, next) => {
 
     if (!product || !seller || product.sellerId.toString() !== seller._id.toString()) {
         return next(new AppError('You can\'t update that product', 400));
-    }  
+    }
     const updatedDoc = await Product.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true

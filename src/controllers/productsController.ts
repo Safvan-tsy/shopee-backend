@@ -1,6 +1,6 @@
 import AppError from "@utils/appError";
 import catchAsync from "@utils/catchAsync";
-import Product  from "@models/product/productsModel";
+import Product from "@models/product/productsModel";
 import { Review } from "@models/product/reviewModel";
 
 declare global {
@@ -141,7 +141,7 @@ const getReviews = catchAsync(async (req, res, next) => {
 })
 
 const getTopProducts = catchAsync(async (req, res, next) => {
-    const products = await Product.find().sort({rating:-1})
+    const products = await Product.find().sort({ rating: -1 })
 
     res.status(200).json({
         status: "success",

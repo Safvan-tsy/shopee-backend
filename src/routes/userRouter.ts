@@ -1,11 +1,7 @@
 import express from 'express';
 import {
-    getAllUsers,
-    getUserById,
     getUserProfile,
-    updateUserById,
     updateUserProfile,
-    deleteUser,
     getCarts,
     addCart,
     deleteCart
@@ -14,15 +10,11 @@ import {
     signUp,
     login,
     logout,
-    protect,
-    isAdmin
+    protect
 } from '@controllers/authController';
 
 const router = express.Router()
 
-router
-    .route('/')
-    .get(protect, isAdmin, getAllUsers)
 
 router
     .route('/signup')
@@ -44,10 +36,5 @@ router
     .route('/cart/:id')
     .delete(protect, deleteCart)
 
-router
-    .route('/:id')
-    .get(protect, isAdmin, getUserById)
-    .put(protect, isAdmin, updateUserById)
-    .delete(protect, isAdmin, deleteUser)
 
 export default router;
