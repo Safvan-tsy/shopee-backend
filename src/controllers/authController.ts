@@ -117,13 +117,6 @@ const protect = catchAsync(async (req: AuthenticatedRequest, res: Response, next
 
 })
 
-const isAdmin = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    if (req.user && req.user.isAdmin) {
-        next();
-    } else {
-        return next(new AppError('not authorized admin', 401))
-    }
-})
 
 const isSeller = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (req.user && req.user.isSeller) {
@@ -134,7 +127,6 @@ const isSeller = catchAsync(async (req: AuthenticatedRequest, res: Response, nex
 })
 
 export {
-    isAdmin,
     protect,
     login,
     logout,

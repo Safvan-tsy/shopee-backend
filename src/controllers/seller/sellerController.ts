@@ -59,17 +59,17 @@ const registerSeller = catchAsync(async (req: AuthenticatedRequest, res: Respons
 })
 
 const updateSeller = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const seller = await Seller.findOne({userId:req.user._id});
+    const seller = await Seller.findOne({ userId: req.user._id });
     if (seller) {
-        const seller = await Seller.updateOne({userId:req.user._id}, req.body, {
-            new: true,  
+        const seller = await Seller.updateOne({ userId: req.user._id }, req.body, {
+            new: true,
             runValidators: true
         })
         res.status(200).json({
-            status:"success",
+            status: "success",
             seller
         })
-     
+
     } else {
         return next(new AppError('Seller profile update failed', 400))
     }
@@ -77,11 +77,11 @@ const updateSeller = catchAsync(async (req: AuthenticatedRequest, res: Response,
 
 
 const deleteSeller = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const seller = await Seller.findOne({userId:req.user._id});
+    const seller = await Seller.findOne({ userId: req.user._id });
     if (seller) {
-        await User.deleteOne( {userId:req.user._id});
+        await User.deleteOne({ userId: req.user._id });
         res.status(204).json({
-            status:'success'
+            status: 'success'
         })
     } else {
         return next(new AppError('No seller found', 404))
@@ -89,7 +89,7 @@ const deleteSeller = catchAsync(async (req: AuthenticatedRequest, res: Response,
 })
 
 const getSellerProfile = catchAsync(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const seller = await Seller.findOne({userId:req.user._id});
+    const seller = await Seller.findOne({ userId: req.user._id });
     if (seller) {
         res.status(200).json({
             status: 'success',

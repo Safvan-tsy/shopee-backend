@@ -1,6 +1,11 @@
 import express from 'express';
-import { login, logout, protect, isSeller } from '@controllers/seller/authController';
-import {protect as userProtect} from '@controllers/authController';
+import {
+  login,
+  logout,
+  protect,
+  isSeller
+} from '@controllers/seller/authController';
+import { protect as userProtect } from '@controllers/authController';
 import {
   deleteSeller,
   getSellerProfile,
@@ -10,10 +15,8 @@ import {
 
 import {
   cancelOrder,
-  confirmDelivery,
   getOrderDetails,
   getOrderList,
-  sendDeliveryOtp,
   updateOrder
 } from '@controllers/seller/orderController';
 import {
@@ -41,9 +44,6 @@ router
   .get(protect, isSeller, getOrderDetails)
   .put(protect, isSeller, updateOrder)
   .patch(protect, isSeller, cancelOrder)
-
-router.post('/orders/confirm/:id', protect, isSeller, confirmDelivery);
-router.get('/orders/send-otp/:id', protect, isSeller, sendDeliveryOtp);
 
 router
   .route('/products/image')

@@ -1,11 +1,7 @@
 import express from 'express';
-import { protect, isAdmin } from '@controllers/authController';
+import { protect } from '@controllers/authController';
 import {
-    getAllProducts,
     getOneProduct,
-    addProduct,
-    updateProduct,
-    deleteProduct,
     createReview,
     getReviews,
     getTopProducts
@@ -13,14 +9,6 @@ import {
 
 const router = express.Router()
 
-router
-    .route('/')
-    .get(getAllProducts)
-    .post(protect, isAdmin, addProduct)
-
-router
-    .route('/image')
-    .post(protect, isAdmin)
 
 router
     .route('/top')
@@ -29,8 +17,7 @@ router
 router
     .route('/:id')
     .get(getOneProduct)
-    .put(protect, isAdmin, updateProduct)
-    .delete(protect, isAdmin, deleteProduct)
+
 
 router
     .route('/:id/review')

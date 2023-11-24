@@ -4,8 +4,6 @@ import { Request, Response, NextFunction } from "express";
 import User from "@models/user/userModel";
 import Cart, { CartType } from "@models/user/cartModel"
 import { createSendToken } from "@controllers/authController";
-import { ClientSession } from "mongodb";
-import { Document, Model, DocumentSetOptions, QueryOptions, UpdateQuery, AnyObject, PopulateOptions, MergeType, Query, SaveOptions, ToObjectOptions, FlattenMaps, Require_id, UpdateWithAggregationPipeline, pathsToSkip, Error } from "mongoose";
 
 interface AuthenticatedRequest extends Request {
     user?: any; // Replace `any` with the actual type of the `user` property
