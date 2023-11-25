@@ -1,10 +1,10 @@
 import express from 'express';
-import { protect} from '@controllers/authController';
+import { protect} from '../controllers/authController';
 import {
     getMyOrders, 
     getOrderById, 
     createOrder,
-} from '@controllers/orderController';
+} from '../controllers/orderController';
 
 const router = express.Router()
 

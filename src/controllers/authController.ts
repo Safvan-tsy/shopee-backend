@@ -1,11 +1,11 @@
-import AppError from '@utils/appError'
-import catchAsync from "@utils/catchAsync";
+import AppError from '../utils/appError'
+import catchAsync from "../utils/catchAsync";
 import { Request, Response, NextFunction } from "express";
-import User from "@models/user/userModel";
+import User from "../models/user/userModel";
 import jwt from 'jsonwebtoken';
-import { AuthenticatedRequest } from "@typeStore/user";
-import Seller from "@models/seller/sellerModel";
-import { Email } from '@utils/email';
+import { AuthenticatedRequest } from "../types/user";
+import Seller from "../models/seller/sellerModel";
+import { Email } from '../utils/email';
 
 export const signToken = (id: string) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {

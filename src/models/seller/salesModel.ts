@@ -1,5 +1,5 @@
 import mongoose, { Schema, Types } from "mongoose";
-import { Sales } from "@typeStore/seller";
+import { Sales } from "../../types/seller";
 
 
 const salesSchema = new Schema(

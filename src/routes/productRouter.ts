@@ -1,11 +1,11 @@
 import express from 'express';
-import { protect } from '@controllers/authController';
+import { protect } from '../controllers/authController';
 import {
     getOneProduct,
     createReview,
     getReviews,
     getTopProducts
-} from '@controllers/productsController';
+} from '../controllers/productsController';
 
 const router = express.Router()
 
