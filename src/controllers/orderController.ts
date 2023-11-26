@@ -1,9 +1,9 @@
-import Order, { Orders } from "@models/orderModel";
-import AppError from "@utils/appError";
-import catchAsync from "@utils/catchAsync";
-import Product from "@models/product/productsModel";
-import { Email } from "@utils/email";
-import User from "@models/user/userModel";
+import Order, { Orders } from "../models/orderModel";
+import AppError from "../utils/appError";
+import catchAsync from "../utils/catchAsync";
+import Product from "../models/product/productsModel";
+import { Email } from "../utils/email";
+import User from "../models/user/userModel";
 
 declare global {
     namespace Express {

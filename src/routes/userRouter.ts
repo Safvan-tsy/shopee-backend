@@ -5,13 +5,13 @@ import {
     getCarts,
     addCart,
     deleteCart
-} from '@controllers/userController';
+} from '../controllers/userController';
 import {
     signUp,
     login,
     logout,
     protect
-} from '@controllers/authController';
+} from '../controllers/authController';
 
 const router = express.Router()
 

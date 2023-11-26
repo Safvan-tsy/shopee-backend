@@ -1,4 +1,3 @@
-import 'module-alias/register';
 import express, { Express } from 'express';
 import cookieParser from 'cookie-parser';
 import { Request, Response, NextFunction } from 'express';
@@ -6,12 +5,12 @@ import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import cors from 'cors'
 
-import AppError from '@utils/appError'
-import errorHandler from '@controllers/errorController';
-import productRouter from '@routes/productRouter';
-import userRouter from '@routes/userRouter';
-import orderRouter from '@routes/orderRoutes';
-import sellerRouter from '@routes/seller/sellerRoutes';
+import AppError from './utils/appError'
+import errorHandler from './controllers/errorController';
+import productRouter from './routes/productRouter';
+import userRouter from './routes/userRouter';
+import orderRouter from './routes/orderRoutes';
+import sellerRouter from './routes/seller/sellerRoutes';
 
 const app: Express = express();
 

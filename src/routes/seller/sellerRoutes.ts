@@ -4,21 +4,21 @@ import {
   logout,
   protect,
   isSeller
-} from '@controllers/seller/authController';
-import { protect as userProtect } from '@controllers/authController';
+} from '../../controllers/seller/authController';
+import { protect as userProtect } from '../../controllers/authController';
 import {
   deleteSeller,
   getSellerProfile,
   registerSeller,
   updateSeller
-} from '@controllers/seller/sellerController';
+} from '../../controllers/seller/sellerController';
 
 import {
   cancelOrder,
   getOrderDetails,
   getOrderList,
   updateOrder
-} from '@controllers/seller/orderController';
+} from '../../controllers/seller/orderController';
 import {
   createProduct,
   deleteProduct,
@@ -27,7 +27,7 @@ import {
   prodImageUploader,
   updateProduct,
   uploadProdImages
-} from '@controllers/seller/productsController';
+} from '../../controllers/seller/productsController';
 
 const router = express.Router();
 
